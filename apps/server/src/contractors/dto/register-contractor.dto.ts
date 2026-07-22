@@ -8,9 +8,11 @@ export class RegisterContractorDto {
   @MaxLength(120)
   email?: string | null;
 
+  // 담당자 이름은 대표자명으로 대체되었다. (하위 호환용 optional)
+  @IsOptional()
   @IsString()
   @MaxLength(60)
-  name!: string;
+  name?: string | null;
 
   @IsString()
   @MaxLength(40)
@@ -32,6 +34,11 @@ export class RegisterContractorDto {
   @IsString()
   @MaxLength(200)
   address?: string | null;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  addressDetail?: string | null;
 
   @IsOptional()
   @IsString()

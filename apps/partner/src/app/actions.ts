@@ -92,12 +92,12 @@ export async function registerContractorAction(formData: FormData) {
 
   [
     "email",
-    "name",
     "phone",
     "companyName",
     "representativeName",
     "businessNumber",
     "address",
+    "addressDetail",
     "latitude",
     "longitude",
     "serviceRegions",

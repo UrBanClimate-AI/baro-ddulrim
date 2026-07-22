@@ -86,7 +86,11 @@ export default async function AdminContractorDetailPage({
             </div>
             <div>
               <dt>주소</dt>
-              <dd>{company.address ?? "-"}</dd>
+              <dd>
+                {[company.address, company.addressDetail]
+                  .filter(Boolean)
+                  .join(" ") || "-"}
+              </dd>
             </div>
             <div>
               <dt>승인</dt>

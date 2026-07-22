@@ -74,15 +74,13 @@ function toDatetimeLocal(value: string | null | undefined) {
 }
 
 export function ContractorRegistrationForm({
-  defaultName = "",
   defaultPhone = "",
 }: {
-  defaultName?: string;
   defaultPhone?: string;
 }) {
   return (
     <>
-      <section className="panel-section">
+      <section className="panel-section register-panel">
         <div className="section-header">
           <div>
             <p className="eyebrow">신규 업체</p>
@@ -93,31 +91,8 @@ export function ContractorRegistrationForm({
           <PendingOverlay />
           <div className="form-grid">
             <label className="form-field">
-              <span>담당자 이름</span>
-              <input
-                defaultValue={defaultName}
-                name="name"
-                placeholder="홍길동"
-                required
-              />
-            </label>
-            <label className="form-field">
-              <span>연락처</span>
-              <input
-                defaultValue={defaultPhone}
-                name="phone"
-                placeholder="010-0000-0000"
-                required
-                type="tel"
-              />
-            </label>
-            <label className="form-field">
               <span>업체명</span>
               <input name="companyName" placeholder="바로배관케어" required />
-            </label>
-            <label className="form-field">
-              <span>대표자명</span>
-              <input name="representativeName" placeholder="김대표" required />
             </label>
             <label className="form-field">
               <span>사업자 번호</span>
@@ -127,7 +102,25 @@ export function ContractorRegistrationForm({
                 required
               />
             </label>
-            <LocationSearchInput />
+            <label className="form-field">
+              <span>대표자명</span>
+              <input name="representativeName" placeholder="김대표" required />
+            </label>
+            <label className="form-field">
+              <span>전화번호</span>
+              <input
+                defaultValue={defaultPhone}
+                name="phone"
+                placeholder="010-0000-0000"
+                required
+                type="tel"
+              />
+            </label>
+          </div>
+
+          <LocationSearchInput />
+
+          <div className="form-grid">
             <label className="form-field">
               <span>활동 반경(km)</span>
               <input

@@ -55,10 +55,6 @@ export default async function ContractorProfilePage() {
               <dd>{company.representativeName}</dd>
             </div>
             <div>
-              <dt>담당자</dt>
-              <dd>{context.name || "-"}</dd>
-            </div>
-            <div>
               <dt>이메일</dt>
               <dd>{context.email}</dd>
             </div>
@@ -86,7 +82,11 @@ export default async function ContractorProfilePage() {
             </div>
             <div>
               <dt>주소</dt>
-              <dd>{company.address ?? "-"}</dd>
+              <dd>
+                {[company.address, company.addressDetail]
+                  .filter(Boolean)
+                  .join(" ") || "-"}
+              </dd>
             </div>
             <div>
               <dt>소개</dt>

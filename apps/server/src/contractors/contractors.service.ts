@@ -94,13 +94,14 @@ export class ContractorsService {
       throw new ConflictException("이미 업체 등록이 진행 중인 계정입니다.");
     }
 
-    const name = this.requireCleanString(dto.name, "담당자 이름을 입력해 주세요.");
     const phone = this.requireCleanString(dto.phone, "연락처를 입력해 주세요.");
     const companyName = this.requireCleanString(dto.companyName, "업체명을 입력해 주세요.");
     const representativeName = this.requireCleanString(
       dto.representativeName,
       "대표자 이름을 입력해 주세요."
     );
+    // 담당자 이름은 별도 입력 없이 대표자명을 사용한다.
+    const name = this.cleanString(dto.name) ?? representativeName;
     const businessNumber = this.requireCleanString(
       dto.businessNumber,
       "사업자 번호를 입력해 주세요."
@@ -151,6 +152,7 @@ export class ContractorsService {
           businessLicenseFileUrl,
           companyPhotoUrl,
           address: this.cleanString(dto.address),
+          addressDetail: this.cleanString(dto.addressDetail),
           latitude: dto.latitude ?? null,
           longitude: dto.longitude ?? null,
           serviceRegions: this.parseServiceRegions(dto.serviceRegions),
@@ -597,6 +599,7 @@ export class ContractorsService {
     businessLicenseFileUrl: string | null;
     companyPhotoUrl: string | null;
     address: string | null;
+    addressDetail: string | null;
     latitude: Parameters<typeof toNumber>[0];
     longitude: Parameters<typeof toNumber>[0];
     serviceRegions: string[];
@@ -627,6 +630,7 @@ export class ContractorsService {
       businessNumber: company.businessNumber,
       businessLicenseFileUrl: company.businessLicenseFileUrl,
       companyPhotoUrl: company.companyPhotoUrl,
+      addressDetail: company.addressDetail,
       managerName: company.account.name,
       phone: company.account.phone,
       email: company.account.email,

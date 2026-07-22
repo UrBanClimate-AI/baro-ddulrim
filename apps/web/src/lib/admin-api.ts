@@ -179,6 +179,7 @@ export type AdminContractorCompany = {
   specialties: string[];
   description: string | null;
   address: string | null;
+  addressDetail: string | null;
   latitude: number | null;
   longitude: number | null;
   bidCount: number;

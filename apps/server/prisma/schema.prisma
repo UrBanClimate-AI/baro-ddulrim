@@ -322,6 +322,7 @@ model ContractorCompany {
   businessLicenseFileUrl String?
   companyPhotoUrl        String?
   address                String?
+  addressDetail          String?
   latitude               Decimal?         @db.Decimal(10, 7)
   longitude              Decimal?         @db.Decimal(10, 7)
   serviceRegions         String[]

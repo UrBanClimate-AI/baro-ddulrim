@@ -151,6 +151,16 @@ export function LocationSearchInput() {
 
       {selectedSummary ? <p className="field-note">{selectedSummary}</p> : null}
 
+      {selected || draft.trim() ? (
+        <div className="input-row address-detail-row">
+          <input
+            aria-label="상세 주소"
+            name="addressDetail"
+            placeholder="상세 주소 (동/호수, 층 등)"
+          />
+        </div>
+      ) : null}
+
       {isOpen ? (
         <div className="modal-backdrop">
           <section
