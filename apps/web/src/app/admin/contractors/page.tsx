@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AdminShell } from "@/components/admin-shell";
+import { EmptyTableState } from "@/components/empty-table-state";
 import { getAdminContractorCompanies } from "@/lib/admin-api";
 import { contractorStatusLabels, formatDateTime, labelOf } from "@/lib/labels";
 
@@ -99,7 +100,7 @@ export default async function AdminContractorsPage() {
             </tbody>
           </table>
           {companies.length === 0 ? (
-            <p className="empty-text">등록된 업체가 없습니다.</p>
+            <EmptyTableState message="등록된 업체가 없습니다." />
           ) : null}
         </div>
       </section>

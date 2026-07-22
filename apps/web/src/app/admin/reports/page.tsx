@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AdminShell } from "@/components/admin-shell";
+import { EmptyTableState } from "@/components/empty-table-state";
 import { ReportDateFilter } from "@/components/report-date-filter";
 import { getReports, type ReportListItem } from "@/lib/admin-api";
 import {
@@ -189,7 +190,7 @@ export default async function AdminReportsPage({
             </tbody>
           </table>
           {visibleReports.length === 0 ? (
-            <p className="empty-text">조건에 맞는 신고가 없습니다.</p>
+            <EmptyTableState message="조건에 맞는 신고가 없습니다." />
           ) : null}
         </div>
       </section>

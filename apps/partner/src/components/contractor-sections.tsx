@@ -13,6 +13,7 @@ import {
   submitContractorBidAction,
   submitWorkUpdateAction,
 } from "@/app/actions";
+import { EmptyTableState } from "@/components/empty-table-state";
 import { LocationSearchInput } from "@/components/location-search-input";
 import { PendingOverlay } from "@/components/pending-overlay";
 import type {
@@ -639,7 +640,7 @@ export function ContractorBidsTable({
           </tbody>
         </table>
         {bids.length === 0 ? (
-          <p className="empty-text">아직 제출한 입찰이 없습니다.</p>
+          <EmptyTableState message="아직 제출한 입찰이 없습니다." />
         ) : null}
       </div>
     </section>

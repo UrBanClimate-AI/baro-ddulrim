@@ -2664,3 +2664,35 @@ body {
     justify-content: center;
   }
 }
+
+/* 빈 테이블 상태 — 남는 영역을 채우고 캐릭터+문구 중앙 배치 */
+.empty-table-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: max(280px, calc(100vh - 560px));
+  padding: 32px 16px;
+}
+
+.empty-table-state img {
+  opacity: 0.9;
+}
+
+.empty-table-state p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #5b6b7c;
+}
+
+/* 지도 필터 바: 행 높이를 내용만큼만 (세로 여백 제거) */
+.report-map-layout {
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
+}
+
+.report-map-layout > .map-filter-bar {
+  align-self: start;
+}
