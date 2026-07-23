@@ -14,13 +14,12 @@ const navItems = [
   { href: "/profile", label: "기본정보", icon: User },
 ] as const;
 
-/** 업체 작업 화면 공통 셸 — 본문 왼쪽, 메뉴 오른쪽. */
+/** 업체 작업 화면 공통 셸 — 메뉴 왼쪽, 본문 오른쪽. */
 export function ContractorShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   return (
     <div className="contractor-shell">
-      <div className="contractor-shell-main">{children}</div>
       <aside aria-label="업체 메뉴" className="contractor-side-nav">
         <Link
           className={`contractor-nav-item${pathname === "/" ? " active" : ""}`}
@@ -48,6 +47,7 @@ export function ContractorShell({ children }: { children: ReactNode }) {
           </SubmitButton>
         </form>
       </aside>
+      <div className="contractor-shell-main">{children}</div>
     </div>
   );
 }

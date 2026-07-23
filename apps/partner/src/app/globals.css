@@ -2530,3 +2530,20 @@ body {
 .location-search-field .field-note {
   margin: 6px 0 0;
 }
+
+/* 업체 화면: 메뉴 왼쪽 + 콘텐츠 최대 폭 제한, 가운데 정렬 */
+.contractor-page {
+  width: 100%;
+  max-width: 1160px;
+  margin: 0 auto;
+}
+
+.contractor-shell {
+  grid-template-columns: 200px minmax(0, 1fr);
+}
+
+@media (max-width: 860px) {
+  .contractor-shell {
+    grid-template-columns: 1fr;
+  }
+}
