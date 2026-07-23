@@ -2696,3 +2696,112 @@ body {
 .report-map-layout > .map-filter-bar {
   align-self: start;
 }
+
+/* 고객 웹: 전체 폭 1400 제한 + 가운데 정렬 */
+.shell {
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 신고 화면: 우측 패널 없이 단일 폼을 가운데에 */
+.report-shell {
+  grid-template-columns: 1fr;
+}
+
+.report-shell .customer-panel {
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+/* 약관 동의 체크 */
+.consent-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--bd-line-soft);
+  border-radius: 10px;
+  background: #f7fbfe;
+  font-size: 14px;
+  line-height: 1.6;
+  cursor: pointer;
+}
+
+.consent-check input {
+  margin-top: 3px;
+  width: 18px;
+  height: 18px;
+  min-height: 0;
+  accent-color: var(--bd-primary);
+}
+
+.consent-check a {
+  color: var(--bd-primary);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.consent-check em {
+  font-style: normal;
+  color: var(--bd-red);
+  font-weight: 600;
+}
+
+/* 약관/방침 문서 */
+.legal-main {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 48px 20px 64px;
+}
+
+.legal-main h1 {
+  margin: 4px 0 4px;
+  font-size: 26px;
+  color: var(--bd-ink);
+}
+
+.legal-updated {
+  margin: 0 0 24px;
+  font-size: 13px;
+  color: #6b7a89;
+}
+
+.legal-body h2 {
+  margin: 26px 0 8px;
+  font-size: 17px;
+  color: var(--bd-ink);
+}
+
+.legal-body p,
+.legal-body li {
+  font-size: 15px;
+  line-height: 1.75;
+  color: #33475b;
+}
+
+.legal-body ul {
+  margin: 6px 0;
+  padding-left: 20px;
+}
+
+.legal-body a {
+  color: var(--bd-primary);
+  font-weight: 600;
+}
+
+.legal-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 40px;
+  padding-top: 16px;
+  border-top: 1px solid var(--bd-line-soft);
+  font-size: 14px;
+}
+
+.legal-links a {
+  color: #55677a;
+  text-decoration: underline;
+}

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, FileSearch, Phone } from "lucide-react";
+import { ArrowRight, Phone } from "lucide-react";
 import { createCustomerReportAction } from "@/app/actions";
 import { LocationSearchInput } from "@/components/location-search-input";
 import { PendingOverlay } from "@/components/pending-overlay";
@@ -9,7 +9,7 @@ import Image from "next/image";
 
 export default function NewReportPage() {
   return (
-    <main className="shell">
+    <main className="shell report-shell">
       <section className="customer-panel" aria-labelledby="report-title">
         <div className="brand-row">
           <Image src="/character.png" alt="바로뚫림 캐릭터" width={56} height={56} style={{ objectFit: 'contain' }} priority />
@@ -83,22 +83,30 @@ export default function NewReportPage() {
 
           <ReportPhotoUploader />
 
+          <label className="consent-check">
+            <input name="consent" required type="checkbox" />
+            <span>
+              <a href="/terms" rel="noreferrer" target="_blank">
+                서비스 이용약관
+              </a>
+              ,{" "}
+              <a href="/privacy" rel="noreferrer" target="_blank">
+                개인정보 처리방침
+              </a>
+              ,{" "}
+              <a href="/third-party" rel="noreferrer" target="_blank">
+                제3자 정보 제공
+              </a>
+              에 모두 동의합니다. <em>(필수)</em>
+            </span>
+          </label>
+
           <SubmitButton className="primary-button" type="submit">
             신고 접수 시작
             <ArrowRight aria-hidden="true" size={18} />
           </SubmitButton>
         </form>
       </section>
-
-      <aside className="ops-panel" aria-label="신고 조회">
-        <div className="timeline-card">
-          <h2>내 신고 확인</h2>
-          <Link className="secondary-button" href="/report/lookup">
-            <FileSearch aria-hidden="true" size={16} />
-            조회 화면으로 이동
-          </Link>
-        </div>
-      </aside>
     </main>
   );
 }

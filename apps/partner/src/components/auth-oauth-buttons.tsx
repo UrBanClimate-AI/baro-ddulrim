@@ -5,11 +5,24 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type OAuthProvider = "kakao" | "google";
 
-export function AuthOAuthButtons({ next = "/register" }: { next?: string }) {
+export function AuthOAuthButtons({
+  next = "/register",
+  disabled = false,
+  disabledMessage,
+}: {
+  next?: string;
+  disabled?: boolean;
+  disabledMessage?: string;
+}) {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState<OAuthProvider | null>(null);
 
   async function signInWith(provider: OAuthProvider) {
+    if (disabled) {
+      setError(disabledMessage ?? "약관에 동의해 주세요.");
+      return;
+    }
+
     setPending(provider);
     setError(null);
 

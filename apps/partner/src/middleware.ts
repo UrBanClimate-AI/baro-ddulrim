@@ -10,7 +10,10 @@ const publicPaths = [
   "/signup",
   "/forgot-password",
   "/reset-password",
-  "/auth/callback"
+  "/auth/callback",
+  "/terms",
+  "/privacy",
+  "/third-party"
 ];
 // 이미 로그인했다면 작업대로 보낼 경로
 const redirectIfAuthed = ["/login", "/signup"];

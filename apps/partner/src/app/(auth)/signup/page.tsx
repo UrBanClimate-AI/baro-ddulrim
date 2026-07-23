@@ -14,11 +14,18 @@ export default function ContractorSignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [sentTo, setSentTo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [agreed, setAgreed] = useState(false);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
     setError(null);
+
+    if (!agreed) {
+      setError("약관에 동의해야 가입할 수 있습니다.");
+      setLoading(false);
+      return;
+    }
 
     if (password.length < 8) {
       setError("비밀번호는 8자 이상이어야 합니다.");
@@ -90,7 +97,33 @@ export default function ContractorSignupPage() {
         이메일과 비밀번호로 가입하세요. 업체 정보는 다음 단계에서 입력합니다.
       </p>
 
-      <AuthOAuthButtons next="/register" />
+      <label className="consent-check">
+        <input
+          checked={agreed}
+          onChange={(event) => setAgreed(event.target.checked)}
+          type="checkbox"
+        />
+        <span>
+          <a href="/terms" rel="noreferrer" target="_blank">
+            파트너 이용약관
+          </a>
+          ,{" "}
+          <a href="/privacy" rel="noreferrer" target="_blank">
+            개인정보 처리방침
+          </a>
+          ,{" "}
+          <a href="/third-party" rel="noreferrer" target="_blank">
+            제3자 정보 제공
+          </a>
+          에 모두 동의합니다. <em>(필수)</em>
+        </span>
+      </label>
+
+      <AuthOAuthButtons
+        disabled={!agreed}
+        disabledMessage="약관에 동의해야 가입할 수 있습니다."
+        next="/register"
+      />
 
       <div className="auth-divider">
         <span>또는 이메일로 가입</span>
