@@ -24,14 +24,19 @@ const fallbackDatabaseUrl = "postgresql://postgres:postgres@localhost:5432/baro_
 function createPrismaClient() {
   const connectionString = process.env.DATABASE_URL ?? fallbackDatabaseUrl;
   const rejectUnauthorized = process.env.PRISMA_SSL_REJECT_UNAUTHORIZED !== "false";
+  // pg 드라이버는 URL의 ?schema= 파라미터를 무시하므로 어댑터 옵션으로 전달한다.
+  const schema = new URL(connectionString).searchParams.get("schema") ?? undefined;
 
   return new PrismaClient({
-    adapter: new PrismaPg({
-      connectionString,
-      ssl: {
-        rejectUnauthorized
-      }
-    })
+    adapter: new PrismaPg(
+      {
+        connectionString,
+        ssl: {
+          rejectUnauthorized
+        }
+      },
+      schema ? { schema } : undefined
+    )
   });
 }
 

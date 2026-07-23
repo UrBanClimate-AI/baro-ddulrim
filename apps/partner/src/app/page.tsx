@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 import Image from "next/image";
+import { logoutAction } from "@/app/actions";
+import { SubmitButton } from "@/components/submit-button";
 import {
   ContractorRejectedScreen,
   ContractorSummaryMetrics,
@@ -24,6 +26,8 @@ export default async function ContractorPage() {
   }
 
   const company = context.company;
+  const approved = isApprovedCompany(company);
+  const showGate = company.status === "REJECTED" || !approved;
 
   return (
     <main className="workspace-page contractor-page">
@@ -35,17 +39,26 @@ export default async function ContractorPage() {
             <h1 style={{ margin: 0 }}>업체 작업대</h1>
           </div>
         </div>
+        {showGate ? (
+          <form action={logoutAction}>
+            <SubmitButton className="secondary-button" type="submit">
+              로그아웃
+            </SubmitButton>
+          </form>
+        ) : null}
       </header>
 
-      <ContractorShell>
-        {company.status === "REJECTED" ? (
+      {showGate ? (
+        company.status === "REJECTED" ? (
           <ContractorRejectedScreen company={company} />
-        ) : !isApprovedCompany(company) ? (
-          <ContractorWaitingScreen company={company} />
         ) : (
+          <ContractorWaitingScreen company={company} />
+        )
+      ) : (
+        <ContractorShell>
           <ApprovedWorkspace companyId={company.id} />
-        )}
-      </ContractorShell>
+        </ContractorShell>
+      )}
     </main>
   );
 }
