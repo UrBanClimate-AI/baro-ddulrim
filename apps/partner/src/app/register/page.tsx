@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { logoutAction } from "@/app/actions";
 import { ContractorRegistrationForm } from "@/components/contractor-sections";
@@ -29,12 +28,6 @@ export default async function ContractorRegisterPage() {
       </header>
 
       <ContractorRegistrationForm />
-
-      <div className="action-row split-actions">
-        <Link className="secondary-button" href="/">
-          업체 작업대
-        </Link>
-      </div>
     </main>
   );
 }
