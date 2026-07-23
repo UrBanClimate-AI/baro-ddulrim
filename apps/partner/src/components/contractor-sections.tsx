@@ -347,11 +347,26 @@ export function ContractorAssignmentsSection({
               </div>
               <dl className="info-list compact-list">
                 <div>
-                  <dt>위치</dt>
+                  <dt>주소</dt>
                   <dd>
-                    {assignment.report.placeName ??
+                    {[
+                      assignment.report.placeName,
                       assignment.report.roadAddressText ??
-                      "-"}
+                        assignment.report.addressText,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ") || "-"}
+                  </dd>
+                </div>
+                <div>
+                  <dt>고객 연락처</dt>
+                  <dd>
+                    <a
+                      className="table-link"
+                      href={`tel:${assignment.report.customerPhone}`}
+                    >
+                      {assignment.report.customerPhone}
+                    </a>
                   </dd>
                 </div>
                 <div>

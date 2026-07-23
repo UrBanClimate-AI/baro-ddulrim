@@ -101,6 +101,7 @@ export type ContractorAssignment = {
     urgency: string;
     summary: string | null;
     description: string | null;
+    customerPhone: string;
     addressText: string | null;
     roadAddressText: string | null;
     placeName: string | null;

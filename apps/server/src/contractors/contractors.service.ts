@@ -845,6 +845,7 @@ export class ContractorsService {
       urgency: string;
       summary: string | null;
       description: string | null;
+      customerPhone: string;
       addressText: string | null;
       roadAddressText: string | null;
       placeName: string | null;
@@ -888,6 +889,8 @@ export class ContractorsService {
         urgency: assignment.report.urgency,
         summary: assignment.report.summary,
         description: assignment.report.description,
+        // 배정된 업체에게만 고객 연락처를 공개한다.
+        customerPhone: assignment.report.customerPhone,
         addressText: assignment.report.addressText,
         roadAddressText: assignment.report.roadAddressText,
         placeName: assignment.report.placeName,
