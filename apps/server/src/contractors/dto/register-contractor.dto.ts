@@ -40,6 +40,11 @@ export class RegisterContractorDto {
   @MaxLength(120)
   addressDetail?: string | null;
 
+  // 마케팅 수신 동의(선택). 계정 단위로 기록한다. "true"일 때만 동의.
+  @IsOptional()
+  @IsString()
+  marketingConsent?: string | null;
+
   @IsOptional()
   @IsString()
   serviceRegions?: string | null;

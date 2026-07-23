@@ -164,6 +164,11 @@ export function ContractorRegistrationForm({
               placeholder="보유 장비, 대응 가능 작업, 출동 가능 지역"
             />
           </label>
+          <label className="consent-check consent-optional">
+            <input name="marketingConsent" type="checkbox" />
+            <span>신규 신고·혜택 등 마케팅 정보 수신에 동의합니다. (선택)</span>
+          </label>
+
           <div className="form-grid">
             <label className="form-field">
               <span>사업자등록증</span>

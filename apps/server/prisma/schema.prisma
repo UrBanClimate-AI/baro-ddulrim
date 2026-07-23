@@ -169,6 +169,7 @@ model Report {
   locationProviderPlaceId String?
   locationConfirmedAt     DateTime?
   locationConfirmedBy     LocationConfirmedBy?
+  marketingConsentAt      DateTime?
   adminApprovedAt         DateTime?
   assignedAt              DateTime?
   resolvedAt              DateTime?
@@ -302,13 +303,14 @@ model ReportLocationCandidate {
 }
 
 model ContractorAccount {
-  id         String   @id @default(cuid())
-  authUserId String?  @unique
-  email      String   @unique
-  name       String
-  phone      String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id                 String    @id @default(cuid())
+  authUserId         String?   @unique
+  email              String    @unique
+  name               String
+  phone              String
+  marketingConsentAt DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
   company ContractorCompany?
 }

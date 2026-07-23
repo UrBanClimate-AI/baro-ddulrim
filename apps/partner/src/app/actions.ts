@@ -105,6 +105,11 @@ export async function registerContractorAction(formData: FormData) {
     "yearsOfExperience",
     "description",
   ].forEach((key) => appendText(apiFormData, key, textValue(formData, key)));
+  appendText(
+    apiFormData,
+    "marketingConsent",
+    formData.get("marketingConsent") === "on" ? "true" : null,
+  );
   formData.getAll("specialties").forEach((value) => {
     if (typeof value === "string" && value.trim().length > 0) {
       apiFormData.append("specialties", value);
@@ -142,7 +147,10 @@ export async function updateContractorPhoneAction(formData: FormData) {
       "Content-Type": "application/json",
       ...(await authHeader()),
     },
-    body: JSON.stringify({ phone }),
+    body: JSON.stringify({
+      phone,
+      marketingConsent: formData.get("marketingConsent") === "on",
+    }),
   });
 
   if (!response.ok) {

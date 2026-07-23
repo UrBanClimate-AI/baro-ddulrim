@@ -117,6 +117,8 @@ export class ReportsService {
             dto.latitude != null && dto.longitude != null
               ? LocationConfirmedBy.CUSTOMER
               : null,
+          marketingConsentAt:
+            dto.marketingConsent === "true" ? new Date() : null,
         },
       });
 

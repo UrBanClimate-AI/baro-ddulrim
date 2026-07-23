@@ -2805,3 +2805,9 @@ body {
   color: #55677a;
   text-decoration: underline;
 }
+
+/* 선택 동의(마케팅)는 필수 동의보다 옅게 */
+.consent-optional {
+  background: #ffffff;
+  border-style: dashed;
+}

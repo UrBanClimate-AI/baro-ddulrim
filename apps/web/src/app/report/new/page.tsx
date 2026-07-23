@@ -101,6 +101,13 @@ export default function NewReportPage() {
             </span>
           </label>
 
+          <label className="consent-check consent-optional">
+            <input name="marketingConsent" type="checkbox" />
+            <span>
+              할인·이벤트 등 마케팅 정보 수신에 동의합니다. (선택)
+            </span>
+          </label>
+
           <SubmitButton className="primary-button" type="submit">
             신고 접수 시작
             <ArrowRight aria-hidden="true" size={18} />

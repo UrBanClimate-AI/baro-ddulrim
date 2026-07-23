@@ -12,6 +12,11 @@ export class CreateCustomerReportDto {
   @IsEnum(Urgency)
   urgency?: Urgency | null;
 
+  // 마케팅 수신 동의(선택). 신고 건 단위로 기록한다. "true"일 때만 동의.
+  @IsOptional()
+  @IsString()
+  marketingConsent?: string | null;
+
   @IsString()
   @MaxLength(200)
   location!: string;

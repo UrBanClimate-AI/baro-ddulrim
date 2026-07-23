@@ -43,7 +43,11 @@ export class ContractorsController {
     @CurrentAccount() account: AuthAccount,
     @Body() dto: UpdateMyContactDto
   ) {
-    return this.contractorsService.updateAccountPhone(account, dto.phone);
+    return this.contractorsService.updateAccountPhone(
+      account,
+      dto.phone,
+      dto.marketingConsent
+    );
   }
 
   @Post("register")

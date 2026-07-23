@@ -127,6 +127,7 @@ export type ContractorContext = {
   email: string;
   name: string;
   phone: string;
+  marketingOptIn?: boolean;
   company: ContractorCompany | null;
 };
 

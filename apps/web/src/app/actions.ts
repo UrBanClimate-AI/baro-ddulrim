@@ -38,6 +38,11 @@ export async function createCustomerReportAction(formData: FormData) {
   appendText(apiFormData, "longitude", textValue(formData, "longitude"));
   appendText(apiFormData, "description", textValue(formData, "description"));
   appendText(apiFormData, "urgency", textValue(formData, "urgency"));
+  appendText(
+    apiFormData,
+    "marketingConsent",
+    formData.get("marketingConsent") === "on" ? "true" : null,
+  );
 
   formData
     .getAll("attachments")

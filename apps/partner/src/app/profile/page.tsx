@@ -118,6 +118,14 @@ export default async function ContractorProfilePage() {
                 type="tel"
               />
             </label>
+            <label className="consent-check consent-optional">
+              <input
+                defaultChecked={context.marketingOptIn ?? false}
+                name="marketingConsent"
+                type="checkbox"
+              />
+              <span>신규 신고·혜택 등 마케팅 정보 수신에 동의합니다. (선택)</span>
+            </label>
             <div className="action-row">
               <SubmitButton className="primary-button" type="submit">
                 연락처 저장

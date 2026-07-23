@@ -60,26 +60,39 @@ export class ContractorsService {
 
   /** 로그인한 업체 계정과 연결된 업체 프로필을 반환한다. */
   async getMyContext(account: AuthAccount) {
-    const company = account.companyId
-      ? await this.findCompanyProfile(account.companyId)
-      : null;
+    const [record, company] = await Promise.all([
+      this.prisma.contractorAccount.findUnique({
+        where: { id: account.id }
+      }),
+      account.companyId ? this.findCompanyProfile(account.companyId) : null
+    ]);
 
     return {
       id: account.id,
       email: account.email,
-      name: account.name,
-      phone: account.phone,
+      name: record?.name ?? account.name,
+      phone: record?.phone ?? account.phone,
+      marketingOptIn: Boolean(record?.marketingConsentAt),
       company
     };
   }
 
-  /** 담당자 연락처만 수정한다. 그 외 계정/업체 정보는 이 경로로 바꿀 수 없다. */
-  async updateAccountPhone(account: AuthAccount, phone: string) {
+  /** 담당자 연락처·마케팅 수신 동의만 수정한다. 그 외 계정/업체 정보는 이 경로로 바꿀 수 없다. */
+  async updateAccountPhone(
+    account: AuthAccount,
+    phone: string,
+    marketingConsent?: boolean
+  ) {
     const cleanPhone = this.requireCleanString(phone, "연락처를 입력해 주세요.");
 
     await this.prisma.contractorAccount.update({
       where: { id: account.id },
-      data: { phone: cleanPhone }
+      data: {
+        phone: cleanPhone,
+        ...(marketingConsent === undefined
+          ? {}
+          : { marketingConsentAt: marketingConsent ? new Date() : null })
+      }
     });
 
     return this.getMyContext({ ...account, phone: cleanPhone });
@@ -131,7 +144,9 @@ export class ContractorsService {
         where: { id: account.id },
         data: {
           name,
-          phone
+          phone,
+          marketingConsentAt:
+            dto.marketingConsent === "true" ? new Date() : null
         }
       });
 
