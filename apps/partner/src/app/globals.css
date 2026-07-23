@@ -2534,7 +2534,7 @@ body {
 /* 업체 화면: 메뉴 왼쪽 + 콘텐츠 최대 폭 제한, 가운데 정렬 */
 .contractor-page {
   width: 100%;
-  max-width: 1160px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
