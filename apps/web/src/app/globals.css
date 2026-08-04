@@ -601,6 +601,38 @@ a.primary-button {
   font-size: 15px;
 }
 
+.admin-sidebar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-nav-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.admin-sidebar-panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 28px;
+  min-height: 0;
+}
+
+.admin-nav-backdrop {
+  display: none;
+}
+
 .admin-nav {
   display: grid;
   gap: 6px;
@@ -623,6 +655,12 @@ a.primary-button {
   background: #e8f5fb;
   color: var(--color-primary-dark);
   outline: 0;
+}
+
+.admin-nav a.active {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  box-shadow: inset 3px 0 0 var(--color-primary);
 }
 
 .admin-content {
@@ -1568,18 +1606,58 @@ a.primary-button {
 
   .admin-layout {
     grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
   }
 
+  /* 사이드바 → 상단 고정 바. 메뉴는 햄버거 토글로 여는 드롭다운 */
   .admin-sidebar {
-    position: static;
+    z-index: 30;
+    gap: 0;
     min-height: auto;
-    padding: 18px;
+    padding: 10px 16px;
     border-right: 0;
     border-bottom: 1px solid var(--color-line);
   }
 
+  .admin-nav-toggle {
+    display: inline-flex;
+  }
+
+  /* 열린 메뉴 밖을 탭하면 닫히도록 화면 전체를 덮는 반투명 배경 */
+  .admin-nav-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(13, 27, 42, 0.4);
+  }
+
+  .admin-sidebar-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    display: none;
+    gap: 10px;
+    max-height: calc(100dvh - 64px);
+    padding: 14px 16px 18px;
+    background: var(--bd-primary-dark);
+    box-shadow: 0 18px 32px rgba(15, 23, 42, 0.28);
+    overflow-y: auto;
+  }
+
+  .admin-sidebar[data-open="true"] .admin-sidebar-panel {
+    display: flex;
+  }
+
   .admin-nav {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .admin-logout {
+    margin-top: 4px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
   }
 
   .admin-content {
@@ -1605,9 +1683,21 @@ a.primary-button {
     padding: 20px;
   }
 
-  .status-grid,
-  .dashboard-grid {
+  .status-grid {
     grid-template-columns: 1fr;
+  }
+
+  /* 지도: 모바일에서는 화면 높이에 맞춰 축소 */
+  .admin-map-surface {
+    min-height: auto;
+  }
+
+  .report-map-layout {
+    min-height: auto;
+  }
+
+  .map-toolbar {
+    padding: 14px 16px;
   }
 
   .report-item,
@@ -1639,10 +1729,6 @@ a.primary-button {
 }
 
 @media (max-width: 640px) {
-  .admin-nav {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .admin-content {
     padding: 16px;
   }
@@ -2810,4 +2896,163 @@ body {
 .consent-optional {
   background: #ffffff;
   border-style: dashed;
+}
+
+/* ---------------------------------------------------------------- */
+/* 관리자 반응형: 태블릿(~960px)·모바일(~700px) 보정.                  */
+/* 뒤쪽 규칙이 앞의 데스크톱 규칙을 덮어쓰도록 파일 끝에 위치한다.      */
+/* ---------------------------------------------------------------- */
+
+@media (max-width: 960px) {
+  /* 지도 캔버스: 화면 높이에 맞춰 축소 (위 520px 규칙 덮어쓰기) */
+  .report-map-canvas,
+  .kakao-map-container {
+    min-height: min(420px, 60dvh);
+  }
+}
+
+@media (max-width: 700px) {
+  /* 목록 테이블 → 카드 레이아웃. th는 숨기고 td에 data-label로 표기 */
+  .data-table {
+    display: block;
+    min-width: 0;
+  }
+
+  .data-table thead {
+    display: none;
+  }
+
+  .data-table tbody {
+    display: grid;
+    gap: 12px;
+  }
+
+  .data-table tr {
+    display: grid;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid var(--color-line);
+    border-radius: 10px;
+    background: #ffffff;
+  }
+
+  .data-table th,
+  .data-table td {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+    padding: 0;
+    border-bottom: 0;
+  }
+
+  .data-table td::before {
+    content: attr(data-label);
+    grid-column: 1;
+    grid-row: 1;
+    padding-top: 2px;
+    color: var(--color-muted);
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  /* 라벨(1열) 외의 모든 값은 2열에 쌓는다 */
+  .data-table td > * {
+    grid-column: 2;
+  }
+
+  .data-table td span {
+    margin-top: 3px;
+  }
+
+  .data-table tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  /* 카드 안 첫 링크를 카드 전체로 확장해 어디를 눌러도 상세로 이동 */
+  .data-table tbody tr {
+    position: relative;
+  }
+
+  .data-table td .table-link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  .data-table tbody tr:active {
+    background: #f5fbff;
+  }
+
+  /* 상세 화면 탭: 줄바꿈 대신 한 줄 가로 스크롤 */
+  .detail-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+
+  .detail-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .detail-tab {
+    flex: 0 0 auto;
+  }
+
+  /* 지표 카드: 모바일에서 1열 대신 2×2 */
+  .dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* 기간 필터: 입력이 남는 폭을 나눠 갖고 버튼은 한 줄 아래로 */
+  .date-filter-bar label {
+    flex: 1 1 40%;
+  }
+
+  .date-filter-bar input[type="date"] {
+    width: 100%;
+  }
+
+  /* 터치 타깃은 40px 이상 유지 */
+  .filter-chip {
+    min-height: 40px;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 640px) {
+  /* 관리자 로그인 */
+  .auth-shell {
+    min-height: 100dvh;
+    padding: 16px;
+  }
+
+  .auth-card {
+    padding: 24px 20px;
+  }
+
+  /* 액션 버튼: 세로로 쌓고 전체 폭으로 눌리기 쉽게 */
+  .action-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .action-row .primary-button,
+  .action-row .secondary-button,
+  .split-actions .primary-button,
+  .split-actions .secondary-button {
+    width: 100%;
+  }
+
+  /* iOS: 입력 폰트가 16px 미만이면 포커스 시 화면이 확대되는 것 방지 */
+  .form-field input,
+  .form-field select,
+  .form-field textarea,
+  .date-filter-bar input[type="date"],
+  .auth-card input {
+    font-size: 16px;
+  }
 }

@@ -68,7 +68,7 @@ export default async function AdminContractorsPage() {
             <tbody>
               {companies.map((company) => (
                 <tr key={company.id}>
-                  <td>
+                  <td data-label="업체">
                     <Link
                       className="table-link"
                       href={`/admin/contractors/${company.id}`}
@@ -77,24 +77,24 @@ export default async function AdminContractorsPage() {
                     </Link>
                     <span>{company.businessNumber}</span>
                   </td>
-                  <td>
+                  <td data-label="담당">
                     <strong>{company.managerName}</strong>
                     <span>{company.phone}</span>
                   </td>
-                  <td>
+                  <td data-label="지역">
                     <strong>{company.serviceRegions.join(", ") || "-"}</strong>
                     <span>{company.address ?? "-"}</span>
                   </td>
-                  <td>
+                  <td data-label="상태">
                     <span className="status-badge">
                       {labelOf(contractorStatusLabels, company.status)}
                     </span>
                   </td>
-                  <td>
+                  <td data-label="활동">
                     <span>입찰 {company.bidCount}</span>
                     <span>배정 {company.assignmentCount}</span>
                   </td>
-                  <td>{formatDateTime(company.approvedAt)}</td>
+                  <td data-label="승인">{formatDateTime(company.approvedAt)}</td>
                 </tr>
               ))}
             </tbody>

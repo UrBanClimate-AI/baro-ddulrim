@@ -160,31 +160,31 @@ export default async function AdminReportsPage({
             <tbody>
               {visibleReports.map((report) => (
                 <tr key={report.id}>
-                  <td>
+                  <td data-label="접수번호">
                     <Link className="table-link" href={`/admin/reports/${report.reportNo}`}>
                       {report.reportNo}
                     </Link>
                     <span>{labelOf(channelLabels, report.channel)}</span>
                   </td>
-                  <td>
+                  <td data-label="신고 내용">
                     <strong>{report.summary ?? "요약 없음"}</strong>
                     <span>
                       {labelOf(issueTypeLabels, report.issueType)} ·{" "}
                       {labelOf(urgencyLabels, report.urgency)}
                     </span>
                   </td>
-                  <td>
+                  <td data-label="위치">
                     <strong>{report.placeName ?? "-"}</strong>
                     <span>{report.roadAddressText ?? report.addressText ?? "-"}</span>
                   </td>
-                  <td>
+                  <td data-label="상태">
                     <span className={`status-badge ${statusTone(report.status)}`}>
                       {labelOf(statusLabels, report.status)}
                     </span>
                   </td>
-                  <td>{report.bidCount}건</td>
-                  <td>{formatCurrency(report.minEstimatedPrice)}</td>
-                  <td>{formatDateTime(report.createdAt)}</td>
+                  <td data-label="입찰">{report.bidCount}건</td>
+                  <td data-label="최저 견적">{formatCurrency(report.minEstimatedPrice)}</td>
+                  <td data-label="접수 시각">{formatDateTime(report.createdAt)}</td>
                 </tr>
               ))}
             </tbody>

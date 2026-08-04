@@ -37,7 +37,7 @@ export default async function AdminTemplatesPage() {
             <tbody>
               {templates.map((template) => (
                 <tr key={template.id}>
-                  <td>
+                  <td data-label="이름">
                     <Link
                       className="table-link"
                       href={`/admin/templates/${template.id}`}
@@ -46,15 +46,15 @@ export default async function AdminTemplatesPage() {
                     </Link>
                     <span>{template.content}</span>
                   </td>
-                  <td>{labelOf(templateChannelLabels, template.channel)}</td>
-                  <td>
+                  <td data-label="채널">{labelOf(templateChannelLabels, template.channel)}</td>
+                  <td data-label="상태">
                     <span className="status-badge">
                       {template.isActive ? "활성" : "비활성"}
                     </span>
                   </td>
-                  <td>{template.usageCount}회</td>
-                  <td>v{template.versionCount}</td>
-                  <td>{formatDateTime(template.updatedAt)}</td>
+                  <td data-label="사용">{template.usageCount}회</td>
+                  <td data-label="버전">v{template.versionCount}</td>
+                  <td data-label="수정">{formatDateTime(template.updatedAt)}</td>
                 </tr>
               ))}
             </tbody>
