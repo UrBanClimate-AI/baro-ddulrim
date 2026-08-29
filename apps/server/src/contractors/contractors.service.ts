@@ -41,12 +41,20 @@ const usableContractorStatuses: ContractorStatus[] = [
 /** 공개 게시판에 노출할 상태 라벨. REJECTED는 목록에서 제외되므로 매핑하지 않는다. */
 const PUBLIC_BOARD_STATUS_LABEL: Record<ContractorStatus, string> = {
   [ContractorStatus.REVIEWING]: "검토중",
-  [ContractorStatus.APPROVED]: "상담예정",
-  [ContractorStatus.ACTIVE]: "협력확정",
+  // APPROVED는 ACTIVE로 자동 전환되므로 협력업체로 동일 취급 (레거시 데이터 대비)
+  [ContractorStatus.APPROVED]: "협력업체",
+  [ContractorStatus.ACTIVE]: "협력업체",
   [ContractorStatus.INACTIVE]: "보류",
   [ContractorStatus.RESTRICTED]: "보류",
   [ContractorStatus.REJECTED]: "보류"
 };
+
+// 랜딩 현황판에 노출할 상태 (검토중 / 협력업체만)
+const PUBLIC_BOARD_VISIBLE_STATUSES: ContractorStatus[] = [
+  ContractorStatus.REVIEWING,
+  ContractorStatus.APPROVED,
+  ContractorStatus.ACTIVE
+];
 
 const biddableReportStatuses: ReportStatus[] = [
   ReportStatus.APPROVED_FOR_BIDDING,
@@ -212,7 +220,7 @@ export class ContractorsService {
   async findPublicBoard() {
     const companies = await this.prisma.contractorCompany.findMany({
       where: {
-        status: { not: ContractorStatus.REJECTED }
+        status: { in: PUBLIC_BOARD_VISIBLE_STATUSES }
       },
       orderBy: { createdAt: "desc" },
       select: {
@@ -254,22 +262,25 @@ export class ContractorsService {
       throw new NotFoundException("업체를 찾을 수 없습니다.");
     }
 
+    // 승인(APPROVED)은 곧바로 활성(ACTIVE)으로 자동 전환한다.
+    const targetStatus =
+      dto.status === ContractorStatus.APPROVED
+        ? ContractorStatus.ACTIVE
+        : dto.status;
+
     const company = await this.prisma.contractorCompany.update({
       where: { id: companyId },
       data: {
-        status: dto.status,
+        status: targetStatus,
         statusReason: this.cleanString(dto.statusReason),
         approvedAt:
-          dto.status === ContractorStatus.APPROVED || dto.status === ContractorStatus.ACTIVE
-            ? new Date()
-            : undefined
+          targetStatus === ContractorStatus.ACTIVE ? new Date() : undefined
       },
       include: this.companyInclude()
     });
 
     const becameApproved =
-      (dto.status === ContractorStatus.APPROVED ||
-        dto.status === ContractorStatus.ACTIVE) &&
+      targetStatus === ContractorStatus.ACTIVE &&
       current.status !== ContractorStatus.APPROVED &&
       current.status !== ContractorStatus.ACTIVE;
 
