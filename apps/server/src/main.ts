@@ -12,10 +12,21 @@ async function bootstrap() {
     "WEB_ORIGIN",
     "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001",
   );
-  const allowedOrigins = webOrigin
-    .split(",")
-    .map((origin) => origin.trim())
-    .filter(Boolean);
+  // 랜딩 페이지(GitHub Pages)는 공개 게시판 API 호출을 위해 항상 허용한다.
+  const landingOrigins = [
+    "https://dev-hleah.github.io",
+    "https://xn--2e0bm8ujoggxunsc.org",
+    "https://www.xn--2e0bm8ujoggxunsc.org",
+  ];
+  const allowedOrigins = [
+    ...new Set([
+      ...webOrigin
+        .split(",")
+        .map((origin) => origin.trim())
+        .filter(Boolean),
+      ...landingOrigins,
+    ]),
+  ];
 
   app.enableCors({
     origin: allowedOrigins,

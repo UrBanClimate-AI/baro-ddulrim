@@ -31,6 +31,12 @@ type UploadedContractorFiles = {
 export class ContractorsController {
   constructor(private readonly contractorsService: ContractorsService) {}
 
+  /** 랜딩 페이지 협력 제안 접수 현황 게시판 (비인증 공개, 마스킹된 정보만 반환) */
+  @Get("public-board")
+  async findPublicBoard() {
+    return this.contractorsService.findPublicBoard();
+  }
+
   @Get("me")
   @UseGuards(ContractorGuard)
   async getMyContext(@CurrentAccount() account: AuthAccount) {

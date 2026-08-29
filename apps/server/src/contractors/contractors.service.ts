@@ -38,6 +38,16 @@ const usableContractorStatuses: ContractorStatus[] = [
   ContractorStatus.ACTIVE
 ];
 
+/** 공개 게시판에 노출할 상태 라벨. REJECTED는 목록에서 제외되므로 매핑하지 않는다. */
+const PUBLIC_BOARD_STATUS_LABEL: Record<ContractorStatus, string> = {
+  [ContractorStatus.REVIEWING]: "검토중",
+  [ContractorStatus.APPROVED]: "상담예정",
+  [ContractorStatus.ACTIVE]: "협력확정",
+  [ContractorStatus.INACTIVE]: "보류",
+  [ContractorStatus.RESTRICTED]: "보류",
+  [ContractorStatus.REJECTED]: "보류"
+};
+
 const biddableReportStatuses: ReportStatus[] = [
   ReportStatus.APPROVED_FOR_BIDDING,
   ReportStatus.BIDDING
@@ -192,6 +202,47 @@ export class ContractorsService {
     });
 
     return companies.map((company) => this.serializeCompany(company));
+  }
+
+  /**
+   * 랜딩 페이지 협력 제안 접수 현황 게시판용 공개 목록.
+   * 개인정보 보호를 위해 마스킹된 업체명과 지역·업종·접수일·상태만 노출한다.
+   * REJECTED 업체는 목록에서 제외한다.
+   */
+  async findPublicBoard() {
+    const companies = await this.prisma.contractorCompany.findMany({
+      where: {
+        status: { not: ContractorStatus.REJECTED }
+      },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        companyName: true,
+        serviceRegions: true,
+        specialties: true,
+        status: true,
+        createdAt: true
+      }
+    });
+
+    return {
+      items: companies.map((company) => ({
+        no: `P-${company.id.slice(-6).toUpperCase()}`,
+        company: this.maskCompanyName(company.companyName),
+        region: company.serviceRegions.slice(0, 2).join(", ") || "-",
+        sector: company.specialties.slice(0, 2).join(", ") || "-",
+        date: company.createdAt.toISOString().slice(0, 10),
+        status: PUBLIC_BOARD_STATUS_LABEL[company.status]
+      }))
+    };
+  }
+
+  /** 업체명 마스킹: 첫 글자와 마지막 글자만 남긴다. (예: 한빛설비 → 한○○비) */
+  private maskCompanyName(name: string) {
+    const trimmed = name.trim();
+    if (trimmed.length <= 1) return trimmed;
+    if (trimmed.length === 2) return `${trimmed[0]}○`;
+    return `${trimmed[0]}${"○".repeat(trimmed.length - 2)}${trimmed[trimmed.length - 1]}`;
   }
 
   async updateCompanyStatus(companyId: string, dto: UpdateContractorStatusDto) {
