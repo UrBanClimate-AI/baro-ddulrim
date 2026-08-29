@@ -17,6 +17,8 @@ async function bootstrap() {
     "https://dev-hleah.github.io",
     "https://xn--2e0bm8ujoggxunsc.org",
     "https://www.xn--2e0bm8ujoggxunsc.org",
+    "https://hasugulab.com",
+    "https://www.hasugulab.com",
   ];
   const allowedOrigins = [
     ...new Set([
