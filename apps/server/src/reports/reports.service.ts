@@ -26,6 +26,7 @@ import {
 import { AiAnalysisService } from "../ai/ai-analysis.service";
 import { NotificationsService } from "../notifications/notifications.service";
 import { MapsService } from "../maps/maps.service";
+import { DistributionService } from "../distribution/distribution.service";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateCustomerReportDto } from "./dto/create-customer-report.dto";
 import {
@@ -49,6 +50,7 @@ export class ReportsService {
     private readonly notifications: NotificationsService,
     private readonly aiAnalysis: AiAnalysisService,
     private readonly maps: MapsService,
+    private readonly distribution: DistributionService,
   ) {}
 
   async createFromCustomer(
@@ -205,6 +207,12 @@ export class ReportsService {
       created.report.reportNo,
       created.messageId,
       files,
+    );
+
+    // 관리자 텔레그램 — 신규 신고 접수
+    await this.notifications.notifyAdminNewReport(
+      created.report.reportNo,
+      summary,
     );
 
     return this.findOne(created.report.reportNo);
@@ -559,8 +567,8 @@ export class ReportsService {
         );
       }
 
-      const nextStatus = ReportStatus.BIDDING;
-      const reason = this.cleanString(dto.reason) ?? "관리자 입찰 승인";
+      const nextStatus = ReportStatus.AWAITING_ASSIGNMENT;
+      const reason = this.cleanString(dto.reason) ?? "관리자 배분 승인";
       const now = new Date();
 
       const nextReport = await tx.report.update({
@@ -590,6 +598,9 @@ export class ReportsService {
 
       return nextReport;
     });
+
+    // 승인 후 배분 시작 (자동: 첫 제안 / 수동: 관리자 대기)
+    await this.distribution.startDistribution(updated.id);
 
     return this.findOne(updated.reportNo);
   }

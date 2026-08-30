@@ -22,6 +22,7 @@
     "@nestjs/config": "latest",
     "@nestjs/core": "latest",
     "@nestjs/platform-express": "latest",
+    "@nestjs/schedule": "latest",
     "@nestjs/swagger": "latest",
     "@prisma/adapter-pg": "latest",
     "@prisma/client": "latest",

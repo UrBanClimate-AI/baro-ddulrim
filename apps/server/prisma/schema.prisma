@@ -509,6 +509,7 @@ model ContractorServiceArea {
   id                  String   @id @default(cuid())
   contractorCompanyId String
   regionCode          String // 시군구 레벨 법정동코드 (예: 4129000000)
+  regionName          String // 표시용 시군구 전체명 (예: "경기도 성남시 분당구")
   createdAt           DateTime @default(now())
 
   contractorCompany ContractorCompany @relation(fields: [contractorCompanyId], references: [id], onDelete: Cascade)
