@@ -248,12 +248,10 @@ export function ContractorRejectedScreen({
 
 export function ContractorSummaryMetrics({
   assignments,
-  bids,
-  opportunities,
+  offerCount,
 }: {
   assignments: ContractorAssignment[];
-  bids: ContractorBidWithReport[];
-  opportunities: ContractorOpportunity[];
+  offerCount: number;
 }) {
   const completedAssignmentCount = assignments.filter(
     (assignment) => assignment.report.status === "RESOLVED",
@@ -263,13 +261,8 @@ export function ContractorSummaryMetrics({
     <section className="dashboard-grid compact">
       <article className="metric">
         <TimerReset aria-hidden="true" size={20} />
-        <span>입찰 가능</span>
-        <strong>{opportunities.length}</strong>
-      </article>
-      <article className="metric">
-        <Clock3 aria-hidden="true" size={20} />
-        <span>내 입찰</span>
-        <strong>{bids.length}</strong>
+        <span>배정 제안</span>
+        <strong>{offerCount}</strong>
       </article>
       <article className="metric">
         <Hammer aria-hidden="true" size={20} />
@@ -295,8 +288,8 @@ export function ContractorNavigationPanel() {
         </div>
       </div>
       <div className="action-row split-actions">
-        <Link className="secondary-button" href="/bids">
-          입찰 관리
+        <Link className="secondary-button" href="/offers">
+          배정 제안
         </Link>
         <Link className="primary-button" href="/jobs">
           배정 작업

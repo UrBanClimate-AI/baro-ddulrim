@@ -1,10 +1,6 @@
 import { redirect } from "next/navigation";
-import { ContractorBidsTable } from "@/components/contractor-sections";
 import { ContractorShell } from "@/components/contractor-shell";
-import {
-  getContractorAssignments,
-  getContractorBids,
-} from "@/lib/contractor-api";
+import { getContractorAssignments } from "@/lib/contractor-api";
 import { formatCurrency, formatDateTime, labelOf, statusLabels } from "@/lib/labels";
 import { isApprovedCompany, loadMyContext } from "@/lib/session";
 
@@ -18,10 +14,7 @@ export default async function ContractorHistoryPage() {
     redirect("/");
   }
 
-  const [bids, assignments] = await Promise.all([
-    getContractorBids(company.id),
-    getContractorAssignments(company.id),
-  ]);
+  const assignments = await getContractorAssignments(company.id);
 
   const workHistory = assignments
     .flatMap((assignment) =>
@@ -41,8 +34,6 @@ export default async function ContractorHistoryPage() {
       </header>
 
       <ContractorShell>
-        <ContractorBidsTable bids={bids} />
-
         <section className="panel-section">
           <div className="section-header">
             <div>

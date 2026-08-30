@@ -10,8 +10,7 @@ import {
 import { ContractorShell } from "@/components/contractor-shell";
 import {
   getContractorAssignments,
-  getContractorBids,
-  getContractorOpportunities,
+  getMyOffers,
 } from "@/lib/contractor-api";
 import { isApprovedCompany, loadMyContext } from "@/lib/session";
 
@@ -64,17 +63,15 @@ export default async function ContractorPage() {
 }
 
 async function ApprovedWorkspace({ companyId }: { companyId: string }) {
-  const [opportunities, bids, assignments] = await Promise.all([
-    getContractorOpportunities(companyId),
-    getContractorBids(companyId),
+  const [offers, assignments] = await Promise.all([
+    getMyOffers(),
     getContractorAssignments(companyId),
   ]);
 
   return (
     <ContractorSummaryMetrics
       assignments={assignments}
-      bids={bids}
-      opportunities={opportunities}
+      offerCount={offers.length}
     />
   );
 }
