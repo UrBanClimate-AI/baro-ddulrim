@@ -21,6 +21,7 @@ import { SubmitBidDto } from "./dto/submit-bid.dto";
 import { SubmitWorkUpdateDto } from "./dto/submit-work-update.dto";
 import { UpdateContractorStatusDto } from "./dto/update-contractor-status.dto";
 import { UpdateMyContactDto } from "./dto/update-my-contact.dto";
+import { UpdateServiceAreasDto } from "./dto/update-service-areas.dto";
 
 type UploadedContractorFiles = {
   businessLicense?: Array<{ buffer: Buffer; mimetype: string; originalname: string; size: number }>;
@@ -54,6 +55,15 @@ export class ContractorsController {
       dto.phone,
       dto.marketingConsent
     );
+  }
+
+  @Patch("me/service-areas")
+  @UseGuards(ContractorGuard)
+  async updateMyServiceAreas(
+    @CurrentAccount() account: AuthAccount,
+    @Body() dto: UpdateServiceAreasDto
+  ) {
+    return this.contractorsService.updateServiceAreas(account, dto.codes);
   }
 
   @Post("register")

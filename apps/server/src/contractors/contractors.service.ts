@@ -15,6 +15,7 @@ import {
 import type { AuthAccount } from "../auth/auth.types";
 import { NotificationsService } from "../notifications/notifications.service";
 import { PrismaService } from "../prisma/prisma.service";
+import { RegionsService } from "../regions/regions.service";
 import { sanitizeSpecialties } from "./contractor-specialties";
 import { RegisterContractorDto } from "./dto/register-contractor.dto";
 import { SubmitBidDto } from "./dto/submit-bid.dto";
@@ -73,8 +74,49 @@ export class ContractorsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
-    private readonly notifications: NotificationsService
+    private readonly notifications: NotificationsService,
+    private readonly regions: RegionsService
   ) {}
+
+  /** 담당지역 코드 목록 → 시군구 Region 검증 후 {code,name} 반환 */
+  private async resolveServiceAreas(
+    value: string[] | string | null | undefined
+  ) {
+    const codes = (Array.isArray(value) ? value : value ? [value] : [])
+      .map((c) => c.trim())
+      .filter(Boolean);
+    if (codes.length === 0) return [];
+    const regions = await this.regions.findByCodes([...new Set(codes)]);
+    // 시군구(level2) 코드만 허용
+    return regions
+      .filter((r) => r.sigungu != null)
+      .map((r) => ({ regionCode: r.code, regionName: r.name }));
+  }
+
+  /** 내 업체 담당지역 교체 (기존 삭제 후 재생성) */
+  async updateServiceAreas(account: AuthAccount, codes: string[]) {
+    if (!account.companyId) {
+      throw new NotFoundException("등록된 업체가 없습니다.");
+    }
+    const areas = await this.resolveServiceAreas(codes);
+    await this.prisma.$transaction([
+      this.prisma.contractorServiceArea.deleteMany({
+        where: { contractorCompanyId: account.companyId }
+      }),
+      ...(areas.length > 0
+        ? [
+            this.prisma.contractorServiceArea.createMany({
+              data: areas.map((a) => ({
+                contractorCompanyId: account.companyId as string,
+                regionCode: a.regionCode,
+                regionName: a.regionName
+              }))
+            })
+          ]
+        : [])
+    ]);
+    return this.findCompanyProfile(account.companyId);
+  }
 
   /** 로그인한 업체 계정과 연결된 업체 프로필을 반환한다. */
   async getMyContext(account: AuthAccount) {
@@ -157,6 +199,8 @@ export class ContractorsService {
       files.companyPhoto?.[0] ?? null
     );
 
+    const serviceAreas = await this.resolveServiceAreas(dto.serviceAreaCodes);
+
     const company = await this.prisma.$transaction(async (tx) => {
       await tx.contractorAccount.update({
         where: { id: account.id },
@@ -194,7 +238,8 @@ export class ContractorsService {
           specialties: sanitizeSpecialties(dto.specialties),
           description: this.cleanString(dto.description),
           status: ContractorStatus.REVIEWING,
-          statusReason: "업체 등록 신청"
+          statusReason: "업체 등록 신청",
+          serviceAreas: { create: serviceAreas }
         },
         include: this.companyInclude()
       });
@@ -658,6 +703,10 @@ export class ContractorsService {
   private companyInclude(): Prisma.ContractorCompanyInclude {
     return {
       account: true,
+      serviceAreas: {
+        select: { regionCode: true, regionName: true },
+        orderBy: { regionCode: "asc" }
+      },
       _count: {
         select: {
           bids: true,
@@ -694,6 +743,7 @@ export class ContractorsService {
       name: string;
       phone: string;
     };
+    serviceAreas: { regionCode: string; regionName: string }[];
     _count: {
       bids: number;
       assignments: number;
@@ -714,6 +764,7 @@ export class ContractorsService {
       status: company.status,
       statusReason: company.statusReason,
       serviceRegions: company.serviceRegions,
+      serviceAreas: company.serviceAreas,
       serviceRadiusKm: company.serviceRadiusKm,
       yearsOfExperience: company.yearsOfExperience,
       specialties: company.specialties,

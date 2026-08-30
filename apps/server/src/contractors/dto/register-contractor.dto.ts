@@ -62,6 +62,10 @@ export class RegisterContractorDto {
   @IsOptional()
   specialties?: string[] | string | null;
 
+  // 담당 지역(시군구) 법정동코드 목록. multipart라 단일값이면 string.
+  @IsOptional()
+  serviceAreaCodes?: string[] | string | null;
+
   @IsOptional()
   @IsString()
   description?: string | null;
