@@ -192,9 +192,33 @@ async function clearDemo() {
   await prisma.customer.deleteMany({ where: { id: { startsWith: "demo-" } } });
 }
 
-async function seedContractors() {
+type Area = { sigunguCode: string; sigunguName: string; dongCode: string };
+
+/** Region 마스터에서 시군구+대표 동 몇 개를 뽑아 데모 매칭에 사용 */
+async function loadAreas(): Promise<Area[]> {
+  const sigungu = await prisma.region.findMany({
+    where: { level: 2 },
+    take: 6,
+    orderBy: { code: "asc" }
+  });
+  const areas: Area[] = [];
+  for (const s of sigungu) {
+    const dong = await prisma.region.findFirst({
+      where: { level: 3, code: { startsWith: s.code.slice(0, 5) } },
+      orderBy: { code: "asc" }
+    });
+    if (dong) areas.push({ sigunguCode: s.code, sigunguName: s.name, dongCode: dong.code });
+  }
+  return areas;
+}
+
+async function seedContractors(areas: Area[]) {
   for (let i = 0; i < COMPANIES.length; i++) {
     const c = COMPANIES[i];
+    // 각 업체는 2개 시군구 담당 (겹치도록 → 한 지역에 복수 업체)
+    const myAreas = areas.length
+      ? [areas[i % areas.length], areas[(i + 1) % areas.length]]
+      : [];
     await prisma.contractorAccount.create({
       data: {
         id: `demo-ca-${pad(i + 1)}`,
@@ -217,7 +241,13 @@ async function seedContractors() {
             description: `${c.name} — ${c.spec.join(", ")} 전문.`,
             status: i === COMPANIES.length - 1 ? ContractorStatus.REVIEWING : ContractorStatus.ACTIVE,
             approvedAt: i === COMPANIES.length - 1 ? null : daysAgo(40 - i),
-            createdAt: daysAgo(45 - i)
+            createdAt: daysAgo(45 - i),
+            serviceAreas: {
+              create: myAreas.map((a) => ({
+                regionCode: a.sigunguCode,
+                regionName: a.sigunguName
+              }))
+            }
           }
         }
       }
@@ -227,7 +257,7 @@ async function seedContractors() {
 
 const REPORT_COUNT = 36;
 
-async function seedReports() {
+async function seedReports(areas: Area[]) {
   const activeCompanies = COMPANIES.map((_, i) => `demo-cc-${pad(i + 1)}`).slice(0, COMPANIES.length - 1);
   let misIssue = 0;
   let misUrg = 0;
@@ -291,6 +321,7 @@ async function seedReports() {
         placeName: loc.place,
         latitude: loc.lat,
         longitude: loc.lng,
+        regionCode: areas.length ? areas[n % areas.length].dongCode : null,
         locationProvider: MapProvider.KAKAO,
         locationConfirmedAt: createdAt,
         locationConfirmedBy: LocationConfirmedBy.SYSTEM,
@@ -425,12 +456,15 @@ async function main() {
   console.log("· 대상 DB:", dbHost);
   console.log("· 기존 demo-* 정리 중…");
   await clearDemo();
+  console.log("· 지역(시군구) 로드…");
+  const areas = await loadAreas();
+  console.log(`  담당지역 후보: ${areas.map((a) => a.sigunguName).join(", ") || "(Region 없음)"}`);
   console.log("· 업체 생성…");
-  await seedContractors();
+  await seedContractors(areas);
   console.log("· 업체 로그인 비번 부여(Supabase Auth)…");
   const authDone = await seedAuthCredentials();
   console.log("· 신고/AI분석/입찰/배정/작업 생성…");
-  const { misIssue, misUrg } = await seedReports();
+  const { misIssue, misUrg } = await seedReports(areas);
 
   console.log("\n✅ 데모 데이터 생성 완료");
   console.log(`   업체: ${COMPANIES.length}곳 (활성 ${COMPANIES.length - 1})`);
