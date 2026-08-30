@@ -93,6 +93,55 @@ export class ContractorsService {
       .map((r) => ({ regionCode: r.code, regionName: r.name }));
   }
 
+  /** 관리자 — 업체 처리 활동(배정/완료/제안·거절) 요약 + 상세 */
+  async findCompanyActivity(companyId: string) {
+    const [assignments, offers] = await Promise.all([
+      this.prisma.assignment.findMany({
+        where: { contractorCompanyId: companyId },
+        orderBy: { assignedAt: "desc" },
+        include: {
+          report: {
+            select: { reportNo: true, summary: true, status: true, resolvedAt: true }
+          }
+        }
+      }),
+      this.prisma.assignmentOffer.findMany({
+        where: { contractorCompanyId: companyId },
+        orderBy: { offeredAt: "desc" },
+        include: { report: { select: { reportNo: true, summary: true } } }
+      })
+    ]);
+
+    const assignmentItems = assignments.map((a) => ({
+      reportNo: a.report.reportNo,
+      summary: a.report.summary,
+      status: a.report.status,
+      assignedAt: toIso(a.assignedAt),
+      resolvedAt: toIso(a.report.resolvedAt)
+    }));
+
+    const offerItems = offers.map((o) => ({
+      reportNo: o.report.reportNo,
+      summary: o.report.summary,
+      status: o.status,
+      rejectReason: o.rejectReason,
+      offeredAt: toIso(o.offeredAt)
+    }));
+
+    return {
+      counts: {
+        assigned: assignmentItems.length,
+        completed: assignmentItems.filter((a) => a.status === "RESOLVED").length,
+        offered: offerItems.length,
+        rejected: offerItems.filter(
+          (o) => o.status === "REJECTED" || o.status === "TIMEOUT"
+        ).length
+      },
+      assignments: assignmentItems,
+      offers: offerItems
+    };
+  }
+
   /** 내 업체 담당지역 교체 (기존 삭제 후 재생성) */
   async updateServiceAreas(account: AuthAccount, codes: string[]) {
     if (!account.companyId) {

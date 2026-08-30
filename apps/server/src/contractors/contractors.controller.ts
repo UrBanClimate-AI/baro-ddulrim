@@ -95,6 +95,12 @@ export class ContractorsController {
     return this.contractorsService.findCompaniesForAdmin();
   }
 
+  @Get("admin/companies/:companyId/activity")
+  @UseGuards(AdminGuard)
+  async findCompanyActivity(@Param("companyId") companyId: string) {
+    return this.contractorsService.findCompanyActivity(companyId);
+  }
+
   @Patch("admin/companies/:companyId/status")
   @UseGuards(AdminGuard)
   async updateCompanyStatus(

@@ -319,6 +319,36 @@ export function getReportOffers(reportId: string) {
   );
 }
 
+export type CompanyActivity = {
+  counts: {
+    assigned: number;
+    completed: number;
+    offered: number;
+    rejected: number;
+  };
+  assignments: {
+    reportNo: string;
+    summary: string | null;
+    status: string;
+    assignedAt: string | null;
+    resolvedAt: string | null;
+  }[];
+  offers: {
+    reportNo: string;
+    summary: string | null;
+    status: string;
+    rejectReason: string | null;
+    offeredAt: string | null;
+  }[];
+};
+
+export function getCompanyActivity(companyId: string) {
+  return fetchJson<CompanyActivity>(
+    `/contractors/admin/companies/${encodeURIComponent(companyId)}/activity`,
+    { counts: { assigned: 0, completed: 0, offered: 0, rejected: 0 }, assignments: [], offers: [] }
+  );
+}
+
 export function getAppSettings() {
   return fetchJson<AppSetting[]>("/settings", []);
 }

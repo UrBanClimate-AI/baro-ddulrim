@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdminShell } from "@/components/admin-shell";
-import { getAdminContractorCompanies } from "@/lib/admin-api";
+import { CompanyActivityCards } from "@/components/company-activity";
+import { getAdminContractorCompanies, getCompanyActivity } from "@/lib/admin-api";
 import { contractorStatusLabels, formatDateTime, labelOf } from "@/lib/labels";
 import { updateContractorStatusAction } from "../actions";
 
@@ -29,6 +30,7 @@ export default async function AdminContractorDetailPage({
     notFound();
   }
 
+  const activity = await getCompanyActivity(company.id);
   const updateStatus = updateContractorStatusAction.bind(null, company.id);
 
   return (
@@ -97,6 +99,14 @@ export default async function AdminContractorDetailPage({
               <dd>{formatDateTime(company.approvedAt)}</dd>
             </div>
           </dl>
+        </article>
+
+        <article className="panel-section">
+          <h2>처리 이력</h2>
+          <p style={{ fontSize: 13, color: "#5b7186", marginBottom: 10 }}>
+            갯수를 클릭하면 상세 내역을 볼 수 있습니다.
+          </p>
+          <CompanyActivityCards activity={activity} />
         </article>
 
         <article className="panel-section">
