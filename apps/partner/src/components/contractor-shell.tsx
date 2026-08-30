@@ -8,8 +8,8 @@ import { logoutAction } from "@/app/actions";
 import { SubmitButton } from "@/components/submit-button";
 
 const navItems = [
+  { href: "/offers", label: "배정 제안", icon: Gavel },
   { href: "/jobs", label: "배정 작업", icon: Hammer },
-  { href: "/bids", label: "입찰", icon: Gavel },
   { href: "/history", label: "기록", icon: FileText },
   { href: "/profile", label: "기본정보", icon: User },
 ] as const;

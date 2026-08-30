@@ -15,6 +15,39 @@ async function authHeader(): Promise<Record<string, string>> {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
+export async function acceptOfferAction(offerId: string) {
+  const response = await fetch(
+    `${apiBaseUrl}/distribution/offers/${encodeURIComponent(offerId)}/accept`,
+    { method: "POST", headers: await authHeader() }
+  );
+  if (!response.ok) {
+    throw new Error((await response.text()) || "수락 처리에 실패했습니다.");
+  }
+  revalidatePath("/offers");
+  revalidatePath("/jobs");
+  redirect("/jobs");
+}
+
+export async function rejectOfferAction(offerId: string, formData: FormData) {
+  const reason = formData.get("reason");
+  const detail = formData.get("detail");
+  const response = await fetch(
+    `${apiBaseUrl}/distribution/offers/${encodeURIComponent(offerId)}/reject`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...(await authHeader()) },
+      body: JSON.stringify({
+        reason: typeof reason === "string" ? reason : "OTHER",
+        detail: typeof detail === "string" && detail.trim() ? detail.trim() : null
+      })
+    }
+  );
+  if (!response.ok) {
+    throw new Error((await response.text()) || "거절 처리에 실패했습니다.");
+  }
+  revalidatePath("/offers");
+}
+
 function textValue(formData: FormData, key: string) {
   const value = formData.get(key);
 

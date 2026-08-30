@@ -195,3 +195,23 @@ export function getContractorAssignments(companyId: string) {
     []
   );
 }
+
+export type ContractorOffer = {
+  id: string;
+  sequence: number;
+  distanceKm: number | null;
+  deadline: string;
+  offeredAt: string;
+  report: {
+    reportNo: string;
+    summary: string | null;
+    description: string | null;
+    issueType: string | null;
+    urgency: string;
+    placeName: string | null;
+  };
+};
+
+export function getMyOffers() {
+  return authedFetchJson<ContractorOffer[]>("/distribution/me/offers", []);
+}
