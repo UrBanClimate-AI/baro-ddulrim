@@ -32,6 +32,7 @@ import {
   urgencyLabels,
 } from "@/lib/labels";
 import { CONTRACTOR_SPECIALTIES } from "@/lib/contractor-specialties";
+import { RegionPicker } from "@/components/region-picker";
 
 const workStatusOptions = [
   "DISPATCH_SCHEDULED",
@@ -138,14 +139,10 @@ export function ContractorRegistrationForm({
               />
             </label>
           </div>
-          <label className="form-field">
-            <span>활동 지역</span>
-            <input
-              name="serviceRegions"
-              placeholder="서울, 경기 남부"
-              required
-            />
-          </label>
+          <fieldset className="form-field">
+            <legend>담당 지역 (시/군/구 다중 선택)</legend>
+            <RegionPicker />
+          </fieldset>
           <fieldset className="form-field checkbox-group">
             <legend>주 종목 (다중 선택)</legend>
             <div className="checkbox-grid">

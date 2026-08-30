@@ -115,6 +115,11 @@ export async function registerContractorAction(formData: FormData) {
       apiFormData.append("specialties", value);
     }
   });
+  formData.getAll("serviceAreaCodes").forEach((value) => {
+    if (typeof value === "string" && value.trim().length > 0) {
+      apiFormData.append("serviceAreaCodes", value);
+    }
+  });
   appendFile(apiFormData, "businessLicense", formData.get("businessLicense"));
   appendFile(apiFormData, "companyPhoto", formData.get("companyPhoto"));
 
