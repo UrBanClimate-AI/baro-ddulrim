@@ -19,6 +19,9 @@ async function bootstrap() {
     "https://www.xn--2e0bm8ujoggxunsc.org",
     "https://hasugulab.com",
     "https://www.hasugulab.com",
+    // 운영 앱 서브도메인 (브라우저에서 직접 API 호출)
+    "https://report.hasugulab.com",
+    "https://partner.hasugulab.com",
   ];
   const allowedOrigins = [
     ...new Set([
