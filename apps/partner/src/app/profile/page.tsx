@@ -1,7 +1,11 @@
 import { redirect } from "next/navigation";
-import { updateContractorPhoneAction } from "@/app/actions";
+import {
+  updateContractorPhoneAction,
+  updateServiceAreasAction,
+} from "@/app/actions";
 import { ContractorShell } from "@/components/contractor-shell";
 import { PendingOverlay } from "@/components/pending-overlay";
+import { RegionPicker } from "@/components/region-picker";
 import { SubmitButton } from "@/components/submit-button";
 import { formatDateTime, labelOf } from "@/lib/labels";
 import { loadMyContext } from "@/lib/session";
@@ -129,6 +133,29 @@ export default async function ContractorProfilePage() {
             <div className="action-row">
               <SubmitButton className="primary-button" type="submit">
                 연락처 저장
+              </SubmitButton>
+            </div>
+          </form>
+        </section>
+
+        <section className="panel-section">
+          <div className="section-header">
+            <div>
+              <p className="eyebrow">수정 가능</p>
+              <h2>담당 지역</h2>
+            </div>
+          </div>
+          <form action={updateServiceAreasAction} className="admin-form compact-form">
+            <PendingOverlay />
+            <RegionPicker
+              initial={(company.serviceAreas ?? []).map((a) => ({
+                code: a.regionCode,
+                name: a.regionName,
+              }))}
+            />
+            <div className="action-row">
+              <SubmitButton className="primary-button" type="submit">
+                담당 지역 저장
               </SubmitButton>
             </div>
           </form>

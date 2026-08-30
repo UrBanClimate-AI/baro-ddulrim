@@ -15,6 +15,21 @@ async function authHeader(): Promise<Record<string, string>> {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
+export async function updateServiceAreasAction(formData: FormData) {
+  const codes = formData
+    .getAll("serviceAreaCodes")
+    .filter((v): v is string => typeof v === "string" && v.trim().length > 0);
+  const response = await fetch(`${apiBaseUrl}/contractors/me/service-areas`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...(await authHeader()) },
+    body: JSON.stringify({ codes })
+  });
+  if (!response.ok) {
+    throw new Error((await response.text()) || "담당지역 저장에 실패했습니다.");
+  }
+  revalidatePath("/profile");
+}
+
 export async function acceptOfferAction(offerId: string) {
   const response = await fetch(
     `${apiBaseUrl}/distribution/offers/${encodeURIComponent(offerId)}/accept`,
@@ -68,40 +83,6 @@ function numberValue(formData: FormData, key: string) {
 
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
-}
-
-export async function submitContractorBidAction(
-  companyId: string,
-  reportId: string,
-  formData: FormData,
-) {
-  const response = await fetch(
-    `${apiBaseUrl}/contractors/${encodeURIComponent(companyId)}/bids`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(await authHeader()),
-      },
-      body: JSON.stringify({
-        reportId,
-        estimatedPrice: numberValue(formData, "estimatedPrice"),
-        availableTime: textValue(formData, "availableTime"),
-        canWork: true,
-        workNote: textValue(formData, "workNote"),
-        extraCostPolicy: textValue(formData, "extraCostPolicy"),
-      }),
-    },
-  );
-
-  if (!response.ok) {
-    const message = await response.text();
-    throw new Error(message || "입찰을 제출하지 못했습니다.");
-  }
-
-  // redirect 없이 revalidate만 — 화면 전체 로딩 없이 현재 화면이 갱신된다.
-  revalidatePath("/");
-  revalidatePath("/bids");
 }
 
 function appendText(target: FormData, key: string, value: string | null) {

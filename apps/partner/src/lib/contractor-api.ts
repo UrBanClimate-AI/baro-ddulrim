@@ -11,6 +11,7 @@ export type ContractorCompany = {
   status: string;
   statusReason?: string | null;
   serviceRegions: string[];
+  serviceAreas?: { regionCode: string; regionName: string }[];
   serviceRadiusKm: number | null;
   yearsOfExperience?: number | null;
   specialties?: string[];
@@ -23,59 +24,6 @@ export type ContractorCompany = {
   assignmentCount: number;
   workUpdateCount: number;
   approvedAt?: string | null;
-};
-
-export type ContractorBid = {
-  id: string;
-  reportId: string;
-  contractorCompanyId: string;
-  estimatedPrice: number | null;
-  availableTime: string | null;
-  canWork: boolean;
-  workNote: string | null;
-  extraCostPolicy: string | null;
-  status: string;
-  submittedAt: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-};
-
-export type ContractorOpportunity = {
-  id: string;
-  reportNo: string;
-  status: string;
-  issueType: string | null;
-  urgency: string;
-  summary: string | null;
-  description: string | null;
-  addressText: string | null;
-  roadAddressText: string | null;
-  placeName: string | null;
-  latitude: number | null;
-  longitude: number | null;
-  bidCount: number;
-  attachmentCount: number;
-  messageCount: number;
-  createdAt: string | null;
-  adminApprovedAt: string | null;
-  myBid: ContractorBid | null;
-};
-
-export type ContractorBidWithReport = ContractorBid & {
-  report: {
-    id: string;
-    reportNo: string;
-    status: string;
-    issueType: string | null;
-    urgency: string;
-    summary: string | null;
-    placeName: string | null;
-    addressText: string | null;
-    assignedCompanyName: string | null;
-    createdAt: string | null;
-    assignedAt: string | null;
-    resolvedAt: string | null;
-  };
 };
 
 export type ContractorAssignment = {
@@ -175,19 +123,6 @@ export async function getMyContext(): Promise<ContractorContext | null> {
   }
 }
 
-export function getContractorOpportunities(companyId: string) {
-  return authedFetchJson<ContractorOpportunity[]>(
-    `/contractors/${encodeURIComponent(companyId)}/opportunities`,
-    []
-  );
-}
-
-export function getContractorBids(companyId: string) {
-  return authedFetchJson<ContractorBidWithReport[]>(
-    `/contractors/${encodeURIComponent(companyId)}/bids`,
-    []
-  );
-}
 
 export function getContractorAssignments(companyId: string) {
   return authedFetchJson<ContractorAssignment[]>(
