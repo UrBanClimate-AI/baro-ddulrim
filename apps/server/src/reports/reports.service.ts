@@ -25,6 +25,7 @@ import {
 } from "../generated/prisma/client";
 import { AiAnalysisService } from "../ai/ai-analysis.service";
 import { NotificationsService } from "../notifications/notifications.service";
+import { MapsService } from "../maps/maps.service";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateCustomerReportDto } from "./dto/create-customer-report.dto";
 import {
@@ -47,6 +48,7 @@ export class ReportsService {
     private readonly config: ConfigService,
     private readonly notifications: NotificationsService,
     private readonly aiAnalysis: AiAnalysisService,
+    private readonly maps: MapsService,
   ) {}
 
   async createFromCustomer(
@@ -83,6 +85,12 @@ export class ReportsService {
     const aiProvider =
       ai?.provider ?? (await this.aiAnalysis.getConfiguredProvider());
 
+    // 좌표가 있으면 법정동코드(b_code)를 미리 조회 (지역 배분 매칭용)
+    const regionCode =
+      dto.latitude != null && dto.longitude != null
+        ? await this.maps.regionCodeFromCoord(dto.latitude, dto.longitude)
+        : null;
+
     const created = await this.prisma.$transaction(async (tx) => {
       const customer = await tx.customer.upsert({
         where: { phone },
@@ -107,6 +115,7 @@ export class ReportsService {
           placeName: this.cleanString(dto.placeName),
           latitude: dto.latitude ?? null,
           longitude: dto.longitude ?? null,
+          regionCode,
           locationProvider:
             dto.latitude != null && dto.longitude != null
               ? MapProvider.KAKAO

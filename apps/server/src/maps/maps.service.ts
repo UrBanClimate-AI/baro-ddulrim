@@ -50,6 +50,32 @@ export class MapsService {
     private readonly config: ConfigService,
   ) {}
 
+  /** 좌표 → 법정동코드(b_code). 지역 배분 매칭용. 실패 시 null. */
+  async regionCodeFromCoord(
+    latitude: number,
+    longitude: number,
+  ): Promise<string | null> {
+    const apiKey = this.config.get<string>("KAKAO_REST_API_KEY")?.trim();
+    if (!apiKey) return null;
+
+    try {
+      const res = await fetch(
+        `https://dapi.kakao.com/v2/local/geo/coord2regioncode.json?x=${longitude}&y=${latitude}`,
+        { headers: { Authorization: `KakaoAK ${apiKey}` } },
+      );
+      if (!res.ok) return null;
+      const json = (await res.json()) as {
+        documents?: Array<{ region_type?: string; code?: string }>;
+      };
+      const docs = json.documents ?? [];
+      // region_type "B" = 법정동. 카카오 좌표→행정구역 응답에서 B의 code 사용.
+      const legal = docs.find((d) => d.region_type === "B") ?? docs[0];
+      return legal?.code ?? null;
+    } catch {
+      return null;
+    }
+  }
+
   async searchLocations(query: string | undefined) {
     const cleanQuery = query?.trim();
 

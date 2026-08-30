@@ -6,6 +6,7 @@ import { MapsService } from "./maps.service";
 @Module({
   imports: [PrismaModule],
   controllers: [MapsController],
-  providers: [MapsService]
+  providers: [MapsService],
+  exports: [MapsService]
 })
 export class MapsModule {}

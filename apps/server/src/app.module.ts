@@ -11,6 +11,7 @@ import { MapsModule } from "./maps/maps.module";
 import { MessageTemplatesModule } from "./message-templates/message-templates.module";
 import { NotificationsModule } from "./notifications/notifications.module";
 import { PrismaModule } from "./prisma/prisma.module";
+import { RegionsModule } from "./regions/regions.module";
 import { ReportsModule } from "./reports/reports.module";
 import { SettingsModule } from "./settings/settings.module";
 
@@ -29,6 +30,7 @@ import { SettingsModule } from "./settings/settings.module";
     CustomersModule,
     MapsModule,
     MessageTemplatesModule,
+    RegionsModule,
     ReportsModule,
     SettingsModule
   ],
