@@ -23,6 +23,27 @@ const settingDefinitions = [
       { label: "Kakao", value: "kakao" },
       { label: "Naver", value: "naver" }
     ]
+  },
+  {
+    key: "distribution_mode",
+    title: "배분 방식",
+    description:
+      "자동은 신고 지역 업체에 거리순으로 자동 제안, 수동은 관리자가 업체를 직접 지정합니다.",
+    options: [
+      { label: "자동 배분", value: "auto" },
+      { label: "수동 배분", value: "manual" }
+    ]
+  },
+  {
+    key: "distribution_timeout_minutes",
+    title: "제안 응답 제한(분)",
+    description:
+      "업체가 이 시간 안에 응답하지 않으면 자동으로 다음 업체에게 넘어갑니다.",
+    options: [
+      { label: "15분", value: "15" },
+      { label: "30분", value: "30" },
+      { label: "60분", value: "60" }
+    ]
   }
 ];
 
