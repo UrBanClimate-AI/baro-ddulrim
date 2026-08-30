@@ -2,6 +2,7 @@
 
 import { MapPin, Search, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useBodyScrollLock } from "@/lib/use-body-scroll-lock";
 
 type LocationCandidate = {
   id: string;
@@ -28,6 +29,7 @@ export function LocationSearchInput() {
   const [autoSearch, setAutoSearch] = useState(false);
   const [candidates, setCandidates] = useState<LocationCandidate[]>([]);
   const [selected, setSelected] = useState<LocationCandidate | null>(null);
+  useBodyScrollLock(isOpen);
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [error, setError] = useState<string | null>(null);

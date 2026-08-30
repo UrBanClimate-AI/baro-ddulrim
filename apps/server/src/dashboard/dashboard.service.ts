@@ -2,6 +2,19 @@ import { Injectable } from "@nestjs/common";
 import { ReportStatus } from "../generated/prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 
+type ClassificationReport = {
+  id: string;
+  reportNo: string;
+  issueType: string | null;
+  urgency: string | null;
+  aiAnalyses: Array<{ issueType: string | null; urgency: string | null }>;
+  revisions: Array<{
+    fieldName: string;
+    reason: string | null;
+    createdAt: Date;
+  }>;
+};
+
 @Injectable()
 export class DashboardService {
   constructor(private readonly prisma: PrismaService) {}
@@ -123,6 +136,127 @@ export class DashboardService {
             .map((report) => [report.assignedAt, report.resolvedAt] as const)
         )
       }
+    };
+  }
+
+  /**
+   * AI 분류 성능 — AI가 최초 예측한 값(AiAnalysis) 대비 관리자가 확정한 최종값을
+   * 정답으로 보고 정확도/오분류를 집계한다. 문의유형·긴급도를 각각 계산한다.
+   */
+  async getClassificationPerformance() {
+    const reports = await this.prisma.report.findMany({
+      select: {
+        id: true,
+        reportNo: true,
+        issueType: true,
+        urgency: true,
+        aiAnalyses: {
+          orderBy: { createdAt: "asc" },
+          take: 1,
+          select: { issueType: true, urgency: true }
+        },
+        revisions: {
+          where: { fieldName: { in: ["issueType", "urgency"] } },
+          orderBy: { createdAt: "desc" },
+          select: {
+            fieldName: true,
+            oldValue: true,
+            newValue: true,
+            reason: true,
+            createdAt: true
+          }
+        }
+      }
+    });
+
+    const issueType = this.buildFieldPerformance(
+      reports,
+      "issueType",
+      (r) => r.aiAnalyses[0]?.issueType ?? null,
+      (r) => r.issueType
+    );
+    const urgency = this.buildFieldPerformance(
+      reports,
+      "urgency",
+      (r) => r.aiAnalyses[0]?.urgency ?? null,
+      (r) => r.urgency
+    );
+
+    return { issueType, urgency };
+  }
+
+  private buildFieldPerformance(
+    reports: ClassificationReport[],
+    field: "issueType" | "urgency",
+    aiValueOf: (r: ClassificationReport) => string | null,
+    finalValueOf: (r: ClassificationReport) => string | null
+  ) {
+    let total = 0;
+    let correct = 0;
+    const confusion = new Map<string, number>();
+    const byLabel = new Map<string, { total: number; correct: number }>();
+    const cases: Array<{
+      reportNo: string;
+      aiValue: string;
+      finalValue: string;
+      reason: string | null;
+      changedAt: string | null;
+    }> = [];
+
+    for (const report of reports) {
+      const ai = aiValueOf(report);
+      if (!ai) continue; // AI가 분류하지 않은 건은 정확도 대상에서 제외
+      const final = finalValueOf(report) ?? ai;
+
+      total += 1;
+      const label = byLabel.get(ai) ?? { total: 0, correct: 0 };
+      label.total += 1;
+
+      if (ai === final) {
+        correct += 1;
+        label.correct += 1;
+      } else {
+        const key = `${ai}→${final}`;
+        confusion.set(key, (confusion.get(key) ?? 0) + 1);
+        const revision = report.revisions.find((rev) => rev.fieldName === field);
+        cases.push({
+          reportNo: report.reportNo,
+          aiValue: ai,
+          finalValue: final,
+          reason: revision?.reason ?? null,
+          changedAt: revision?.createdAt
+            ? revision.createdAt.toISOString()
+            : null
+        });
+      }
+
+      byLabel.set(ai, label);
+    }
+
+    const misclassified = total - correct;
+
+    return {
+      total,
+      correct,
+      misclassified,
+      accuracy: total > 0 ? Math.round((correct / total) * 1000) / 10 : null,
+      byLabel: [...byLabel.entries()]
+        .map(([label, v]) => ({
+          label,
+          total: v.total,
+          correct: v.correct,
+          accuracy: v.total > 0 ? Math.round((v.correct / v.total) * 1000) / 10 : null
+        }))
+        .sort((a, b) => b.total - a.total),
+      confusion: [...confusion.entries()]
+        .map(([pair, count]) => {
+          const [from, to] = pair.split("→");
+          return { from, to, count };
+        })
+        .sort((a, b) => b.count - a.count),
+      cases: cases.sort((a, b) =>
+        (b.changedAt ?? "").localeCompare(a.changedAt ?? "")
+      )
     };
   }
 

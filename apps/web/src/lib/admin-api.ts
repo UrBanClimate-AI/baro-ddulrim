@@ -240,6 +240,49 @@ export function getDashboardSummary() {
   });
 }
 
+export type ClassificationField = {
+  total: number;
+  correct: number;
+  misclassified: number;
+  accuracy: number | null;
+  byLabel: {
+    label: string;
+    total: number;
+    correct: number;
+    accuracy: number | null;
+  }[];
+  confusion: { from: string; to: string; count: number }[];
+  cases: {
+    reportNo: string;
+    aiValue: string;
+    finalValue: string;
+    reason: string | null;
+    changedAt: string | null;
+  }[];
+};
+
+export type ClassificationPerformance = {
+  issueType: ClassificationField;
+  urgency: ClassificationField;
+};
+
+const emptyClassificationField: ClassificationField = {
+  total: 0,
+  correct: 0,
+  misclassified: 0,
+  accuracy: null,
+  byLabel: [],
+  confusion: [],
+  cases: []
+};
+
+export function getClassificationPerformance() {
+  return fetchJson<ClassificationPerformance>("/dashboard/classification", {
+    issueType: emptyClassificationField,
+    urgency: emptyClassificationField
+  });
+}
+
 export function getReports() {
   return fetchJson<ReportListItem[]>("/reports", []);
 }

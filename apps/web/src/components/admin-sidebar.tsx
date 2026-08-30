@@ -11,6 +11,7 @@ const navItems = [
   { href: "/admin/contractors", label: "업체" },
   { href: "/admin/map", label: "지도" },
   { href: "/admin/templates", label: "템플릿" },
+  { href: "/admin/classification", label: "분류 성능" },
   { href: "/admin/settings", label: "설정" }
 ];
 

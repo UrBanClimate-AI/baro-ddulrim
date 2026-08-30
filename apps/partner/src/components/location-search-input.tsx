@@ -2,6 +2,7 @@
 
 import { MapPin, Search, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useBodyScrollLock } from "@/lib/use-body-scroll-lock";
 
 type LocationCandidate = {
   id: string;
@@ -30,6 +31,7 @@ export function LocationSearchInput() {
   const [selected, setSelected] = useState<LocationCandidate | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
+  useBodyScrollLock(isOpen);
   const [error, setError] = useState<string | null>(null);
   // 선택된 주소가 있으면 그 값을, 없으면 직접 입력 중인 텍스트를 보여준다.
   const addressValue = selected ? displayAddress(selected) : draft;

@@ -11,4 +11,9 @@ export class DashboardController {
   async getSummary() {
     return this.dashboardService.getSummary();
   }
+
+  @Get("classification")
+  async getClassification() {
+    return this.dashboardService.getClassificationPerformance();
+  }
 }
