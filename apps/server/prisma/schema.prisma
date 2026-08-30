@@ -23,6 +23,7 @@ enum ReportStatus {
   CUSTOMER_INFO_REQUIRED
   APPROVED_FOR_BIDDING
   BIDDING
+  AWAITING_ASSIGNMENT
   ASSIGNED
   DISPATCH_SCHEDULED
   DISPATCHED
@@ -112,6 +113,22 @@ enum BidStatus {
   REJECTED
 }
 
+enum OfferStatus {
+  OFFERED
+  ACCEPTED
+  REJECTED
+  TIMEOUT
+  CANCELED
+}
+
+enum RejectReason {
+  TOO_FAR
+  NO_TIME
+  NO_EQUIPMENT
+  NOT_SPECIALTY
+  OTHER
+}
+
 enum WorkStatus {
   DISPATCH_SCHEDULED
   DISPATCHED
@@ -167,6 +184,7 @@ model Report {
   longitude               Decimal?             @db.Decimal(10, 7)
   locationProvider        MapProvider?
   locationProviderPlaceId String?
+  regionCode              String? // 법정동코드(카카오 b_code) — 지역 배분 매칭용
   locationConfirmedAt     DateTime?
   locationConfirmedBy     LocationConfirmedBy?
   marketingConsentAt      DateTime?
@@ -185,6 +203,7 @@ model Report {
   locationCandidates ReportLocationCandidate[]
   bids               Bid[]
   assignment         Assignment?
+  offers             AssignmentOffer[]
   workUpdates        WorkUpdate[]
   templateUsages     MessageTemplateUsage[]
 
@@ -194,6 +213,7 @@ model Report {
   @@index([issueType])
   @@index([urgency])
   @@index([createdAt])
+  @@index([regionCode])
 }
 
 model ReportMessage {
@@ -338,10 +358,12 @@ model ContractorCompany {
   createdAt              DateTime         @default(now())
   updatedAt              DateTime         @updatedAt
 
-  account     ContractorAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  bids        Bid[]
-  assignments Assignment[]
-  workUpdates WorkUpdate[]
+  account      ContractorAccount     @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  bids         Bid[]
+  assignments  Assignment[]
+  workUpdates  WorkUpdate[]
+  serviceAreas ContractorServiceArea[]
+  offers       AssignmentOffer[]
 
   @@index([status])
 }
@@ -372,7 +394,8 @@ model Bid {
 model Assignment {
   id                        String   @id @default(cuid())
   reportId                  String   @unique
-  bidId                     String   @unique
+  bidId                     String?  @unique
+  offerId                   String?  @unique
   contractorCompanyId       String
   assignedByAdminId         String?
   selectionReason           String?
@@ -382,7 +405,8 @@ model Assignment {
   createdAt                 DateTime @default(now())
 
   report                  Report             @relation(fields: [reportId], references: [id], onDelete: Cascade)
-  bid                     Bid                @relation(fields: [bidId], references: [id])
+  bid                     Bid?               @relation(fields: [bidId], references: [id])
+  offer                   AssignmentOffer?   @relation(fields: [offerId], references: [id])
   contractorCompany       ContractorCompany  @relation(fields: [contractorCompanyId], references: [id])
   assignedByAdmin         AdminUser?         @relation("AssignedByAdmin", fields: [assignedByAdminId], references: [id])
   customerMessageTemplate MessageTemplate?   @relation(fields: [customerMessageTemplateId], references: [id])
@@ -478,4 +502,41 @@ model Region {
   @@index([level])
   @@index([parentCode])
   @@index([sido, sigungu])
+}
+
+/// 업체 담당 지역 (시군구 단위, 법정동 시군구 코드). 자동 배분 매칭에 사용.
+model ContractorServiceArea {
+  id                  String   @id @default(cuid())
+  contractorCompanyId String
+  regionCode          String // 시군구 레벨 법정동코드 (예: 4129000000)
+  createdAt           DateTime @default(now())
+
+  contractorCompany ContractorCompany @relation(fields: [contractorCompanyId], references: [id], onDelete: Cascade)
+
+  @@unique([contractorCompanyId, regionCode])
+  @@index([regionCode])
+}
+
+/// 배분 제안 이력 — 신고를 업체에 순차 제안하고 수락/거절/타임아웃을 기록.
+model AssignmentOffer {
+  id                  String       @id @default(cuid())
+  reportId            String
+  contractorCompanyId String
+  sequence            Int // 제안 순번 (거리순)
+  distanceKm          Decimal?     @db.Decimal(7, 2)
+  status              OfferStatus  @default(OFFERED)
+  rejectReason        RejectReason?
+  rejectReasonDetail  String?
+  offeredAt           DateTime     @default(now())
+  deadline            DateTime
+  respondedAt         DateTime?
+  createdAt           DateTime     @default(now())
+
+  report            Report            @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  contractorCompany ContractorCompany @relation(fields: [contractorCompanyId], references: [id])
+  assignment        Assignment?
+
+  @@index([reportId, sequence])
+  @@index([contractorCompanyId])
+  @@index([status, deadline])
 }

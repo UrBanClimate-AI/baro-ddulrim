@@ -86,8 +86,8 @@ export class CustomersService {
         ? {
             id: report.assignment.id,
             contractorCompanyName: report.assignment.contractorCompany.companyName,
-            estimatedPrice: report.assignment.bid.estimatedPrice,
-            availableTime: toIso(report.assignment.bid.availableTime),
+            estimatedPrice: report.assignment.bid?.estimatedPrice ?? null,
+            availableTime: toIso(report.assignment.bid?.availableTime ?? null),
             selectionReason: report.assignment.selectionReason,
             customerMessageRendered: report.assignment.customerMessageRendered,
             assignedAt: toIso(report.assignment.assignedAt)

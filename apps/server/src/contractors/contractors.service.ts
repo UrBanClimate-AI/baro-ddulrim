@@ -902,7 +902,7 @@ export class ContractorsService {
   private serializeAssignment(assignment: {
     id: string;
     reportId: string;
-    bidId: string;
+    bidId: string | null;
     contractorCompanyId: string;
     selectionReason: string | null;
     customerMessageRendered: string | null;
@@ -913,7 +913,7 @@ export class ContractorsService {
       availableTime: Date | null;
       workNote: string | null;
       extraCostPolicy: string | null;
-    };
+    } | null;
     report: {
       id: string;
       reportNo: string;
@@ -952,12 +952,14 @@ export class ContractorsService {
       customerMessageRendered: assignment.customerMessageRendered,
       assignedAt: toIso(assignment.assignedAt),
       createdAt: toIso(assignment.createdAt),
-      bid: {
-        estimatedPrice: assignment.bid.estimatedPrice,
-        availableTime: toIso(assignment.bid.availableTime),
-        workNote: assignment.bid.workNote,
-        extraCostPolicy: assignment.bid.extraCostPolicy
-      },
+      bid: assignment.bid
+        ? {
+            estimatedPrice: assignment.bid.estimatedPrice,
+            availableTime: toIso(assignment.bid.availableTime),
+            workNote: assignment.bid.workNote,
+            extraCostPolicy: assignment.bid.extraCostPolicy
+          }
+        : null,
       report: {
         id: assignment.report.id,
         reportNo: assignment.report.reportNo,
