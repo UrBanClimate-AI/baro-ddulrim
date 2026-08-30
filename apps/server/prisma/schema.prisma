@@ -463,3 +463,19 @@ model AppSetting {
   value     Json
   updatedAt DateTime @updatedAt
 }
+
+/// 법정동 기반 지역 마스터 (시도/시군구/읍면동). 신고 지역 판별·업체 담당지역 선택에 사용.
+model Region {
+  code         String   @id // 법정동코드 10자리
+  name         String // 전체명 예: "서울특별시 종로구 청운동"
+  sido         String // 시도명
+  sigungu      String? // 시군구명 (시도 레벨이면 null)
+  eupmyeondong String? // 읍면동명 (시군구 이하 레벨이면 값 존재)
+  level        Int // 1=시도, 2=시군구, 3=읍면동
+  parentCode   String? // 상위 지역 코드
+  isActive     Boolean  @default(true)
+
+  @@index([level])
+  @@index([parentCode])
+  @@index([sido, sigungu])
+}
