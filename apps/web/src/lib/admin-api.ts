@@ -299,6 +299,26 @@ export function getAdminContractorCompanies() {
   return fetchJson<AdminContractorCompany[]>("/contractors/admin/companies", []);
 }
 
+export type ReportOffer = {
+  id: string;
+  sequence: number;
+  companyName: string;
+  distanceKm: number | null;
+  status: string;
+  rejectReason: string | null;
+  rejectReasonDetail: string | null;
+  offeredAt: string;
+  deadline: string;
+  respondedAt: string | null;
+};
+
+export function getReportOffers(reportId: string) {
+  return fetchJson<ReportOffer[]>(
+    `/distribution/reports/${encodeURIComponent(reportId)}/offers`,
+    []
+  );
+}
+
 export function getAppSettings() {
   return fetchJson<AppSetting[]>("/settings", []);
 }

@@ -24,6 +24,29 @@ async function mutate(path: string, init: RequestInit) {
   }
 }
 
+export async function startDistributionAction(reportNo: string, reportId: string) {
+  await mutate(`/distribution/reports/${encodeURIComponent(reportId)}/start`, {
+    method: "POST",
+  });
+  revalidatePath(`/admin/reports/${reportNo}/bids`);
+}
+
+export async function manualOfferAction(
+  reportNo: string,
+  reportId: string,
+  formData: FormData,
+) {
+  const companyId = formData.get("companyId");
+  if (typeof companyId !== "string" || !companyId) {
+    throw new Error("업체를 선택해 주세요.");
+  }
+  await mutate(
+    `/distribution/reports/${encodeURIComponent(reportId)}/offer/${encodeURIComponent(companyId)}`,
+    { method: "POST" },
+  );
+  revalidatePath(`/admin/reports/${reportNo}/bids`);
+}
+
 function textValue(formData: FormData, key: string) {
   const value = formData.get(key);
 

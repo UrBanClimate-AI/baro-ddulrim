@@ -61,7 +61,7 @@ export function AdminReportHeader({
     {
       href: `/admin/reports/${report.reportNo}/bids`,
       key: "bids",
-      label: "입찰/배정",
+      label: "배분",
     },
     {
       href: `/admin/reports/${report.reportNo}/messages`,
