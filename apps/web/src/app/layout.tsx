@@ -1,4 +1,4 @@
-// deploy: 배분 기능 반영
+// deploy: 배분 기능 반영 (web 재배포)
 import type { Metadata } from "next";
 import "./globals.css";
 
