@@ -1,10 +1,28 @@
 import type { Metadata } from "next";
+import { Gothic_A1, IBM_Plex_Sans_KR } from "next/font/google";
 import "./globals.css";
+
+const plex = IBM_Plex_Sans_KR({
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-plex",
+  display: "swap"
+});
+
+const gothic = Gothic_A1({
+  weight: ["700", "800", "900"],
+  subsets: ["latin"],
+  variable: "--font-gothic",
+  display: "swap"
+});
 
 export const metadata: Metadata = {
   title: "바로 뚫림 · 업체",
   description: "배수 작업 업체 배정 및 작업 관리"
 };
+
+// 저장된 테마를 첫 페인트 전에 적용해 깜빡임을 막는다. (기본: 밝음)
+const themeInit = `(function(){try{if(localStorage.getItem("theme")==="dark"){document.documentElement.dataset.theme="dark"}}catch(e){}})()`;
 
 export default function RootLayout({
   children
@@ -12,8 +30,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko">
-      <body>{children}</body>
+    <html lang="ko" className={`${plex.variable} ${gothic.variable}`} suppressHydrationWarning>
+      <body>
+        <script dangerouslySetInnerHTML={{ __html: themeInit }} />
+        {children}
+      </body>
     </html>
   );
 }
