@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
+import { Select } from "@/components/ui/select";
 
 const apiBaseUrl =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:4000";
@@ -62,35 +63,25 @@ export function RegionPicker({
       ))}
 
       <div className="form-grid">
-        <label className="form-field">
+        <div className="form-field">
           <span>시/도</span>
-          <select value={sido} onChange={(e) => setSido(e.target.value)}>
-            <option value="">선택</option>
-            {sidoList.map((o) => (
-              <option key={o.code} value={o.code}>
-                {o.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="form-field">
+          <Select
+            onChange={setSido}
+            options={sidoList.map((o) => ({ value: o.code, label: o.name }))}
+            placeholder="시/도 선택"
+            value={sido}
+          />
+        </div>
+        <div className="form-field">
           <span>시/군/구 (선택 시 추가)</span>
-          <select
-            value=""
+          <Select
             disabled={!sido}
-            onChange={(e) => {
-              add(e.target.value);
-              e.target.value = "";
-            }}
-          >
-            <option value="">선택</option>
-            {sigunguList.map((o) => (
-              <option key={o.code} value={o.code}>
-                {o.name}
-              </option>
-            ))}
-          </select>
-        </label>
+            onChange={add}
+            options={sigunguList.map((o) => ({ value: o.code, label: o.name }))}
+            placeholder="시/군/구 선택"
+            value=""
+          />
+        </div>
       </div>
 
       <div className="region-chips">

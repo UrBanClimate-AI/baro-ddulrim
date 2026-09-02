@@ -1,15 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { X } from "lucide-react";
 import { acceptOfferAction, rejectOfferAction } from "@/app/actions";
+import { Modal } from "@/components/ui/modal";
+import { Pill } from "@/components/ui/pill";
+import { Select } from "@/components/ui/select";
+import { PendingOverlay } from "@/components/pending-overlay";
+import { SubmitButton } from "@/components/submit-button";
 import type { ContractorOffer } from "@/lib/contractor-api";
-import { useBodyScrollLock } from "@/lib/use-body-scroll-lock";
 import {
   issueTypeLabels,
   urgencyLabels,
   labelOf,
-  formatDateTime
+  formatDateTime,
 } from "@/lib/labels";
 
 const REJECT_REASONS = [
@@ -17,15 +20,25 @@ const REJECT_REASONS = [
   { value: "NO_TIME", label: "시간이 없습니다" },
   { value: "NO_EQUIPMENT", label: "장비가 없습니다" },
   { value: "NOT_SPECIALTY", label: "전문 분야가 아닙니다" },
-  { value: "OTHER", label: "기타" }
+  { value: "OTHER", label: "기타" },
 ];
 
+function urgencyTone(urgency: string) {
+  if (urgency === "EMERGENCY") return "bad" as const;
+  if (urgency === "URGENT") return "warn" as const;
+  return "mute" as const;
+}
+
+/** 배정 제안 목록 — 수락 즉시 처리, 거절은 사유 모달. */
 export function OffersList({ offers }: { offers: ContractorOffer[] }) {
   const [rejecting, setRejecting] = useState<ContractorOffer | null>(null);
-  useBodyScrollLock(rejecting != null);
 
   if (offers.length === 0) {
-    return <p className="empty-text">현재 배정 제안이 없습니다.</p>;
+    return (
+      <section className="panel-section">
+        <p className="empty-text">현재 배정 제안이 없습니다. 새 제안이 오면 알림으로 안내됩니다.</p>
+      </section>
+    );
   }
 
   return (
@@ -38,9 +51,9 @@ export function OffersList({ offers }: { offers: ContractorOffer[] }) {
                 <span className="table-link">{o.report.reportNo}</span>
                 <h3>{o.report.summary ?? "신고 요약 없음"}</h3>
               </div>
-              <span className={`urgency-badge ${o.report.urgency.toLowerCase()}`}>
+              <Pill tone={urgencyTone(o.report.urgency)}>
                 {labelOf(urgencyLabels, o.report.urgency)}
-              </span>
+              </Pill>
             </div>
             <dl className="info-list compact-list">
               <div>
@@ -57,20 +70,22 @@ export function OffersList({ offers }: { offers: ContractorOffer[] }) {
               </div>
               <div>
                 <dt>응답 마감</dt>
-                <dd>{formatDateTime(o.deadline)}</dd>
+                <dd className="deadline-mono">{formatDateTime(o.deadline)}</dd>
               </div>
             </dl>
             <p>{o.report.description ?? "상세 내용이 없습니다."}</p>
             <div className="action-row split-actions">
-              <form action={acceptOfferAction.bind(null, o.id)}>
-                <button className="primary-button" type="submit">
+              <form action={acceptOfferAction.bind(null, o.id)} style={{ flex: 1 }}>
+                <PendingOverlay />
+                <SubmitButton className="primary-button" style={{ width: "100%" }} type="submit">
                   수락
-                </button>
+                </SubmitButton>
               </form>
               <button
                 className="secondary-button"
-                type="button"
                 onClick={() => setRejecting(o)}
+                style={{ flex: 1 }}
+                type="button"
               >
                 거절
               </button>
@@ -79,86 +94,31 @@ export function OffersList({ offers }: { offers: ContractorOffer[] }) {
         ))}
       </div>
 
-      {rejecting ? (
-        <div
-          role="dialog"
-          aria-modal="true"
-          onClick={() => setRejecting(null)}
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(15,36,56,0.45)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 20,
-            zIndex: 1000
-          }}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              background: "#fff",
-              borderRadius: 16,
-              padding: 24,
-              width: "min(480px, 100%)",
-              boxShadow: "0 24px 60px -20px rgba(8,62,100,0.4)"
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center"
-              }}
-            >
-              <h2 style={{ margin: 0, fontSize: 17 }}>거절 사유</h2>
-              <button
-                type="button"
-                aria-label="닫기"
-                onClick={() => setRejecting(null)}
-                style={{
-                  border: "none",
-                  background: "#f0f4f7",
-                  borderRadius: 10,
-                  width: 34,
-                  height: 34,
-                  cursor: "pointer"
-                }}
-              >
-                <X aria-hidden="true" size={18} />
-              </button>
+      <Modal
+        onClose={() => setRejecting(null)}
+        open={rejecting != null}
+        title={`거절 사유 · ${rejecting?.report.reportNo ?? ""}`}
+        width={460}
+      >
+        {rejecting ? (
+          <form action={rejectOfferAction.bind(null, rejecting.id)} className="admin-form">
+            <PendingOverlay />
+            <label className="form-field">
+              <span>사유 선택</span>
+              <Select defaultValue="TOO_FAR" name="reason" options={REJECT_REASONS} />
+            </label>
+            <label className="form-field">
+              <span>상세 (선택)</span>
+              <textarea name="detail" placeholder="추가 설명이 있으면 적어주세요" />
+            </label>
+            <div className="action-row">
+              <SubmitButton className="primary-button" type="submit">
+                거절 제출
+              </SubmitButton>
             </div>
-            <p style={{ fontSize: 13.5, color: "#5b7186", marginTop: 6 }}>
-              {rejecting.report.reportNo} 제안을 거절합니다.
-            </p>
-            <form
-              action={rejectOfferAction.bind(null, rejecting.id)}
-              className="admin-form"
-            >
-              <label className="form-field">
-                <span>사유</span>
-                <select name="reason" defaultValue="TOO_FAR">
-                  {REJECT_REASONS.map((r) => (
-                    <option key={r.value} value={r.value}>
-                      {r.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="form-field">
-                <span>상세 (선택)</span>
-                <textarea name="detail" placeholder="추가 설명" />
-              </label>
-              <div className="action-row">
-                <button className="primary-button" type="submit">
-                  거절 제출
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      ) : null}
+          </form>
+        ) : null}
+      </Modal>
     </>
   );
 }

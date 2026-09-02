@@ -2,70 +2,20 @@ import Link from "next/link";
 import {
   AlertTriangle,
   Building2,
-  Clock3,
   FileCheck2,
   Hammer,
   Hourglass,
   TimerReset,
 } from "lucide-react";
-import {
-  registerContractorAction,
-  submitWorkUpdateAction,
-} from "@/app/actions";
+import { registerContractorAction } from "@/app/actions";
 import { LocationSearchInput } from "@/components/location-search-input";
 import { PendingOverlay } from "@/components/pending-overlay";
 import type {
   ContractorAssignment,
   ContractorCompany,
 } from "@/lib/contractor-api";
-import {
-  formatCurrency,
-  formatDateTime,
-  labelOf,
-  statusLabels,
-} from "@/lib/labels";
 import { CONTRACTOR_SPECIALTIES } from "@/lib/contractor-specialties";
 import { RegionPicker } from "@/components/region-picker";
-
-const workStatusOptions = [
-  "DISPATCH_SCHEDULED",
-  "DISPATCHED",
-  "IN_PROGRESS",
-  "RESOLVED",
-];
-
-function nextWorkStatus(currentStatus: string | null) {
-  if (currentStatus === "DISPATCH_SCHEDULED") {
-    return "DISPATCHED";
-  }
-
-  if (currentStatus === "DISPATCHED") {
-    return "IN_PROGRESS";
-  }
-
-  if (currentStatus === "IN_PROGRESS") {
-    return "RESOLVED";
-  }
-
-  return currentStatus ?? "DISPATCH_SCHEDULED";
-}
-
-function toDatetimeLocal(value: string | null | undefined) {
-  if (!value) {
-    return "";
-  }
-
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return "";
-  }
-
-  const localDate = new Date(
-    date.getTime() - date.getTimezoneOffset() * 60_000,
-  );
-  return localDate.toISOString().slice(0, 16);
-}
 
 export function ContractorRegistrationForm({
   defaultPhone = "",
@@ -291,166 +241,3 @@ export function ContractorNavigationPanel() {
     </section>
   );
 }
-
-export function ContractorAssignmentsSection({
-  assignments,
-  selectedCompany,
-}: {
-  assignments: ContractorAssignment[];
-  selectedCompany: ContractorCompany;
-}) {
-  return (
-    <section className="panel-section">
-      <div className="section-header">
-        <div>
-          <p className="eyebrow">작업</p>
-          <h2>배정 작업</h2>
-        </div>
-      </div>
-
-      <div className="assignment-grid">
-        {assignments.map((assignment) => {
-          const submitWorkUpdate = submitWorkUpdateAction.bind(
-            null,
-            selectedCompany.id,
-            assignment.id,
-          );
-          const latestFinalPrice =
-            assignment.workUpdates
-              .filter((update) => update.finalPrice != null)
-              .at(-1)?.finalPrice ?? null;
-
-          return (
-            <article className="assignment-work-card" key={assignment.id}>
-              <div className="opportunity-head">
-                <div>
-                  <span className="table-link">
-                    {assignment.report.reportNo}
-                  </span>
-                  <h3>{assignment.report.summary ?? "배정 작업"}</h3>
-                </div>
-                <span className="status-badge">
-                  {labelOf(statusLabels, assignment.report.status)}
-                </span>
-              </div>
-              <dl className="info-list compact-list">
-                <div>
-                  <dt>주소</dt>
-                  <dd>
-                    {[
-                      assignment.report.placeName,
-                      assignment.report.roadAddressText ??
-                        assignment.report.addressText,
-                    ]
-                      .filter(Boolean)
-                      .join(" · ") || "-"}
-                  </dd>
-                </div>
-                <div>
-                  <dt>고객 연락처</dt>
-                  <dd>
-                    <a
-                      className="table-link"
-                      href={`tel:${assignment.report.customerPhone}`}
-                    >
-                      {assignment.report.customerPhone}
-                    </a>
-                  </dd>
-                </div>
-                <div>
-                  <dt>견적</dt>
-                  <dd>{formatCurrency(assignment.bid.estimatedPrice)}</dd>
-                </div>
-                <div>
-                  <dt>배정</dt>
-                  <dd>{formatDateTime(assignment.assignedAt)}</dd>
-                </div>
-                <div>
-                  <dt>최근 작업</dt>
-                  <dd>{labelOf(statusLabels, assignment.latestWorkStatus)}</dd>
-                </div>
-              </dl>
-              <p>{assignment.report.description ?? "상세 내용이 없습니다."}</p>
-              <form
-                action={submitWorkUpdate}
-                className="admin-form compact-form"
-              >
-                <PendingOverlay />
-                <div className="form-grid">
-                  <label className="form-field">
-                    <span>작업 상태</span>
-                    <select
-                      name="status"
-                      defaultValue={nextWorkStatus(assignment.latestWorkStatus)}
-                    >
-                      {workStatusOptions.map((status) => (
-                        <option key={status} value={status}>
-                          {labelOf(statusLabels, status)}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="form-field">
-                    <span>최종 금액</span>
-                    <input
-                      inputMode="numeric"
-                      name="finalPrice"
-                      placeholder="90000"
-                      defaultValue={latestFinalPrice?.toString() ?? ""}
-                    />
-                  </label>
-                </div>
-                <label className="form-field">
-                  <span>작업 메모</span>
-                  <input
-                    name="note"
-                    placeholder="현장 도착, 고압 세척 완료 등"
-                  />
-                </label>
-                <label className="form-field">
-                  <span>작업 사진 (최대 5장)</span>
-                  <input accept="image/*" multiple name="photos" type="file" />
-                </label>
-                <div className="action-row">
-                  <button className="primary-button" type="submit">
-                    작업 상태 저장
-                  </button>
-                </div>
-              </form>
-              <div className="work-update-list">
-                {assignment.workUpdates.map((update) => (
-                  <div className="work-update-entry" key={update.id}>
-                    <span>{formatDateTime(update.createdAt)}</span>
-                    <strong>{labelOf(statusLabels, update.status)}</strong>
-                    <p>
-                      {update.note ?? "-"}
-                      {update.finalPrice
-                        ? ` · ${formatCurrency(update.finalPrice)}`
-                        : ""}
-                    </p>
-                    {update.photoUrls.length > 0 ? (
-                      <div className="work-photo-grid">
-                        {update.photoUrls.map((url) => (
-                          <a href={url} key={url} rel="noreferrer" target="_blank">
-                            <img alt="작업 사진" src={url} />
-                          </a>
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
-                ))}
-                {assignment.workUpdates.length === 0 ? (
-                  <p className="empty-text">아직 작업 이력이 없습니다.</p>
-                ) : null}
-              </div>
-            </article>
-          );
-        })}
-        {assignments.length === 0 ? (
-          <p className="empty-text">현재 배정된 작업이 없습니다.</p>
-        ) : null}
-      </div>
-    </section>
-  );
-}
-

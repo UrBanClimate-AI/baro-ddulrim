@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
-import { ContractorAssignmentsSection } from "@/components/contractor-sections";
 import { ContractorShell } from "@/components/contractor-shell";
+import { JobBoard } from "@/components/job-board";
 import { getContractorAssignments } from "@/lib/contractor-api";
 import { isApprovedCompany, loadMyContext } from "@/lib/session";
 
@@ -15,20 +15,24 @@ export default async function ContractorJobsPage() {
   }
 
   const assignments = await getContractorAssignments(company.id);
+  const completed = assignments.filter((a) => a.report.status === "RESOLVED").length;
 
   return (
-    <main className="workspace-page contractor-page">
-      <header className="workspace-header">
-        <p className="eyebrow">업체</p>
-        <h1>배정 작업</h1>
-      </header>
-
-      <ContractorShell>
-        <ContractorAssignmentsSection
-          assignments={assignments}
-          selectedCompany={company}
-        />
-      </ContractorShell>
-    </main>
+    <ContractorShell
+      barExtra={
+        <>
+          <span className="live-chip">
+            <span className="live-dot" style={{ background: "var(--color-primary)" }} />
+            진행 <b>{assignments.length - completed}</b>
+          </span>
+          <span className="live-chip">
+            <span className="live-dot" style={{ background: "var(--color-success)" }} />
+            완료 <b>{completed}</b>
+          </span>
+        </>
+      }
+    >
+      <JobBoard assignments={assignments} companyId={company.id} />
+    </ContractorShell>
   );
 }

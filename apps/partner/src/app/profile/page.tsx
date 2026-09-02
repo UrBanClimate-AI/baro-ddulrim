@@ -30,13 +30,7 @@ export default async function ContractorProfilePage() {
   }
 
   return (
-    <main className="workspace-page contractor-page">
-      <header className="workspace-header">
-        <p className="eyebrow">업체</p>
-        <h1>기본정보</h1>
-      </header>
-
-      <ContractorShell>
+    <ContractorShell>
         <section className="panel-section">
           <div className="section-header">
             <div>
@@ -160,7 +154,6 @@ export default async function ContractorProfilePage() {
             </div>
           </form>
         </section>
-      </ContractorShell>
-    </main>
+    </ContractorShell>
   );
 }
