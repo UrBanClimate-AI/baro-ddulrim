@@ -1,3 +1,4 @@
+// deploy: 배분 기능 반영
 import type { Metadata } from "next";
 import "./globals.css";
 
