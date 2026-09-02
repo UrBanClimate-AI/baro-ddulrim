@@ -119,12 +119,18 @@ export function formatDateTime(value: string | null | undefined) {
     return "-";
   }
 
-  return new Intl.DateTimeFormat("ko-KR", {
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit"
-  }).format(new Date(value));
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) {
+    return "-";
+  }
+
+  // 서버(Node)와 브라우저의 로케일 차이(AM/오전)로 인한 hydration 불일치를 막기 위해
+  // Intl 대신 결정적 포맷을 사용한다.
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const h = d.getHours();
+  const ampm = h < 12 ? "오전" : "오후";
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return `${pad(d.getMonth() + 1)}. ${pad(d.getDate())}. ${ampm} ${pad(h12)}:${pad(d.getMinutes())}`;
 }
 
 export function formatDate(value: string | null | undefined) {

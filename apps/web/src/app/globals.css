@@ -3725,3 +3725,120 @@ h1, h2, h3 {
   font-weight: 700;
   color: var(--color-warning);
 }
+
+/* ── 신고 칸반 (작은 카드, 클릭=상세) ── */
+.kanban-board.cols-5 {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+@media (max-width: 1100px) {
+  .kanban-board.cols-5 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .kanban-board.cols-5 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+a.report-card {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-line-strong);
+  border-radius: 10px;
+  background: var(--color-bg);
+  color: inherit;
+  text-decoration: none;
+}
+
+a.report-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+a.report-card.urgent {
+  box-shadow: inset 3px 0 0 var(--color-danger);
+}
+
+a.report-card.urgent:hover {
+  box-shadow: inset 3px 0 0 var(--color-danger), 0 0 0 1px var(--color-primary);
+}
+
+.report-card .rc-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.report-card .rc-no {
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-primary-dark);
+}
+
+.report-card .rc-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.report-card .rc-sub {
+  overflow: hidden;
+  color: var(--color-muted);
+  font-size: 11.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.report-card .rc-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--color-muted);
+  font-size: 10.5px;
+}
+
+/* ── 분포 막대 (대시보드) ── */
+.bar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.bar-line {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: 12px;
+  font-size: 12.8px;
+}
+
+.bar-line .bar-track {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--color-surface-2);
+  overflow: hidden;
+}
+
+.bar-line .bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--color-primary);
+}
+
+.bar-line b {
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}

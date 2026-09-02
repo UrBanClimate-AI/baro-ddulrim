@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ClipboardCheck, Clock3, MapPinned, TimerReset, UsersRound } from "lucide-react";
+import { ClipboardCheck, Clock3, Siren, UsersRound } from "lucide-react";
 import { AdminShell } from "@/components/admin-shell";
 import { KpiGrid, KpiTile } from "@/components/ui/kpi";
 import { getDashboardSummary, getReports } from "@/lib/admin-api";
@@ -10,15 +10,42 @@ import {
   issueTypeLabels,
   labelOf,
   statusLabels,
-  statusTone,
-  urgencyLabels
+  urgencyLabels,
 } from "@/lib/labels";
+import { Pill, reportStatusTone } from "@/components/ui/pill";
 
 export const dynamic = "force-dynamic";
 
+function BarList({ entries }: { entries: [string, number][] }) {
+  const max = Math.max(1, ...entries.map(([, count]) => count));
+
+  return (
+    <div className="bar-list">
+      {entries.map(([label, count]) => (
+        <div className="bar-line" key={label}>
+          <span>{label}</span>
+          <div className="bar-track">
+            <div className="bar-fill" style={{ width: `${Math.round((count / max) * 100)}%` }} />
+          </div>
+          <b>{count}건</b>
+        </div>
+      ))}
+      {entries.length === 0 ? <p className="empty-text">데이터가 없습니다.</p> : null}
+    </div>
+  );
+}
+
 export default async function AdminPage() {
   const [summary, reports] = await Promise.all([getDashboardSummary(), getReports()]);
-  const recentReports = reports.slice(0, 5);
+  const recentReports = reports.slice(0, 7);
+
+  const issueEntries = Object.entries(summary.issueTypeCounts)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 5)
+    .map(([k, v]) => [labelOf(issueTypeLabels, k), v] as [string, number]);
+  const regionEntries = Object.entries(summary.regionCounts)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 5) as [string, number][];
 
   return (
     <AdminShell>
@@ -40,7 +67,7 @@ export default async function AdminPage() {
         />
         <KpiTile
           danger={summary.urgentCount > 0}
-          icon={<MapPinned aria-hidden="true" size={16} />}
+          icon={<Siren aria-hidden="true" size={16} />}
           label="긴급 신고"
           value={summary.urgentCount}
         />
@@ -51,138 +78,126 @@ export default async function AdminPage() {
         />
       </KpiGrid>
 
-      <section className="dashboard-grid compact">
-        <article className="metric">
-          <TimerReset aria-hidden="true" size={20} />
-          <span>평균 승인 시간</span>
-          <strong>{formatMinutes(summary.averageMinutes.approval)}</strong>
-        </article>
-        <article className="metric">
-          <TimerReset aria-hidden="true" size={20} />
-          <span>평균 배정 시간</span>
-          <strong>{formatMinutes(summary.averageMinutes.assignment)}</strong>
-        </article>
-        <article className="metric">
-          <TimerReset aria-hidden="true" size={20} />
-          <span>평균 처리 시간</span>
-          <strong>{formatMinutes(summary.averageMinutes.resolution)}</strong>
-        </article>
-        <article className="metric">
-          <ClipboardCheck aria-hidden="true" size={20} />
-          <span>전체 신고</span>
-          <strong>{summary.totalReports}</strong>
-        </article>
-      </section>
-
-      <section className="detail-grid">
-        <article className="panel-section">
-          <h2>유형별 신고</h2>
-          <div className="stat-bar-list">
-            {Object.entries(summary.issueTypeCounts)
-              .sort(([, a], [, b]) => b - a)
-              .map(([issueType, count]) => (
-                <div className="stat-bar-row" key={issueType}>
-                  <span>{labelOf(issueTypeLabels, issueType)}</span>
-                  <strong>{count}건</strong>
-                </div>
-              ))}
-            {Object.keys(summary.issueTypeCounts).length === 0 ? (
-              <p className="empty-text">데이터가 없습니다.</p>
-            ) : null}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 1.5fr) minmax(0, 1fr)",
+          gap: 16,
+          marginTop: 16,
+          alignItems: "start",
+        }}
+      >
+        {/* 좌: 최근 신고 */}
+        <section className="panel-section">
+          <div className="section-header">
+            <div>
+              <p className="eyebrow">실시간</p>
+              <h2>최근 신고</h2>
+            </div>
+            <Link className="text-link" href="/admin/reports">
+              신고 보드 열기
+            </Link>
           </div>
-        </article>
-
-        <article className="panel-section">
-          <h2>지역별 신고</h2>
-          <div className="stat-bar-list">
-            {Object.entries(summary.regionCounts)
-              .sort(([, a], [, b]) => b - a)
-              .slice(0, 8)
-              .map(([region, count]) => (
-                <div className="stat-bar-row" key={region}>
-                  <span>{region}</span>
-                  <strong>{count}건</strong>
-                </div>
-              ))}
-            {Object.keys(summary.regionCounts).length === 0 ? (
-              <p className="empty-text">데이터가 없습니다.</p>
-            ) : null}
-          </div>
-        </article>
-
-        <article className="panel-section">
-          <h2>업체별 실적</h2>
-          <div className="stat-bar-list">
-            {summary.contractorStats.map((stats) => (
-              <div className="stat-bar-row" key={stats.companyId}>
-                <span>{stats.companyName}</span>
-                <strong>
-                  배정 {stats.assignedCount} · 완료 {stats.resolvedCount}
-                </strong>
-              </div>
-            ))}
-            {summary.contractorStats.length === 0 ? (
-              <p className="empty-text">배정 실적이 없습니다.</p>
-            ) : null}
-          </div>
-        </article>
-      </section>
-
-      <section className="panel-section">
-        <div className="section-header">
-          <div>
-            <p className="eyebrow">실시간</p>
-            <h2>최근 신고</h2>
-          </div>
-          <Link className="text-link" href="/admin/reports">
-            전체 보기
-          </Link>
-        </div>
-
-        <div className="data-table-wrap">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>접수번호</th>
-                <th>내용</th>
-                <th>유형</th>
-                <th>긴급도</th>
-                <th>상태</th>
-                <th>채널</th>
-                <th>접수</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentReports.map((report) => (
-                <tr key={report.id}>
-                  <td data-label="접수번호">
-                    <Link className="table-link" href={`/admin/reports/${report.reportNo}`}>
-                      {report.reportNo}
-                    </Link>
-                  </td>
-                  <td data-label="내용">
-                    <strong>{report.summary ?? "요약 없음"}</strong>
-                    <span>{report.placeName ?? report.addressText ?? "-"}</span>
-                  </td>
-                  <td data-label="유형">{labelOf(issueTypeLabels, report.issueType)}</td>
-                  <td data-label="긴급도">
-                    <span className={`urgency-badge ${report.urgency.toLowerCase()}`}>
-                      {labelOf(urgencyLabels, report.urgency)}
-                    </span>
-                  </td>
-                  <td data-label="상태">
-                    <span className={`status-badge ${statusTone(report.status)}`}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {recentReports.map((report) => (
+              <Link
+                className={`report-card${
+                  report.urgency === "URGENT" || report.urgency === "EMERGENCY" ? " urgent" : ""
+                }`}
+                href={`/admin/reports/${report.reportNo}`}
+                key={report.id}
+              >
+                <span className="rc-top">
+                  <span className="rc-no">{report.reportNo}</span>
+                  <span style={{ display: "inline-flex", gap: 6 }}>
+                    {report.urgency !== "NORMAL" ? (
+                      <span
+                        className={`ui-pill ${report.urgency === "EMERGENCY" ? "tone-bad" : "tone-warn"}`}
+                      >
+                        {labelOf(urgencyLabels, report.urgency)}
+                      </span>
+                    ) : null}
+                    <Pill tone={reportStatusTone(report.status)}>
                       {labelOf(statusLabels, report.status)}
-                    </span>
-                  </td>
-                  <td data-label="채널">{labelOf(channelLabels, report.channel)}</td>
-                  <td data-label="접수">{formatDateTime(report.createdAt)}</td>
-                </tr>
+                    </Pill>
+                  </span>
+                </span>
+                <span className="rc-title">{report.summary ?? "요약 없음"}</span>
+                <span className="rc-sub">
+                  {report.placeName ?? report.roadAddressText ?? report.addressText ?? "-"}
+                </span>
+                <span className="rc-foot">
+                  <span>{labelOf(channelLabels, report.channel)}</span>
+                  <span>{formatDateTime(report.createdAt)}</span>
+                </span>
+              </Link>
+            ))}
+            {recentReports.length === 0 ? (
+              <p className="empty-text">아직 접수된 신고가 없습니다.</p>
+            ) : null}
+          </div>
+        </section>
+
+        {/* 우: 분포 · 처리 시간 · 실적 */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <section className="panel-section">
+            <h2>유형별 분포</h2>
+            <div style={{ marginTop: 12 }}>
+              <BarList entries={issueEntries} />
+            </div>
+          </section>
+
+          <section className="panel-section">
+            <h2>지역별 분포</h2>
+            <div style={{ marginTop: 12 }}>
+              <BarList entries={regionEntries} />
+            </div>
+          </section>
+
+          <section className="panel-section">
+            <h2>평균 처리 시간</h2>
+            <div className="bar-list" style={{ marginTop: 12 }}>
+              <div className="bar-line" style={{ gridTemplateColumns: "1fr auto" }}>
+                <span>접수 → 배분 승인</span>
+                <b>{formatMinutes(summary.averageMinutes.approval)}</b>
+              </div>
+              <div className="bar-line" style={{ gridTemplateColumns: "1fr auto" }}>
+                <span>접수 → 업체 배정</span>
+                <b>{formatMinutes(summary.averageMinutes.assignment)}</b>
+              </div>
+              <div className="bar-line" style={{ gridTemplateColumns: "1fr auto" }}>
+                <span>배정 → 해결</span>
+                <b>{formatMinutes(summary.averageMinutes.resolution)}</b>
+              </div>
+            </div>
+          </section>
+
+          <section className="panel-section">
+            <h2>업체별 실적</h2>
+            <div className="bar-list" style={{ marginTop: 12 }}>
+              {summary.contractorStats.slice(0, 5).map((stats) => (
+                <div
+                  className="bar-line"
+                  key={stats.companyId}
+                  style={{ gridTemplateColumns: "1fr auto" }}
+                >
+                  <span
+                    style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+                  >
+                    {stats.companyName}
+                  </span>
+                  <b>
+                    배정 {stats.assignedCount} · 완료 {stats.resolvedCount}
+                  </b>
+                </div>
               ))}
-            </tbody>
-          </table>
+              {summary.contractorStats.length === 0 ? (
+                <p className="empty-text">배정 실적이 없습니다.</p>
+              ) : null}
+            </div>
+          </section>
         </div>
-      </section>
+      </div>
     </AdminShell>
   );
 }
