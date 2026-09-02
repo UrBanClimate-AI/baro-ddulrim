@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdminShell } from "@/components/admin-shell";
+import { Select } from "@/components/ui/select";
 import { getMessageTemplates } from "@/lib/admin-api";
 import { formatDateTime, labelOf, templateChannelLabels } from "@/lib/labels";
 import { updateMessageTemplateAction } from "../actions";
@@ -55,16 +56,17 @@ export default async function AdminTemplateDetailPage({
                 <span>이름</span>
                 <input name="name" defaultValue={template.name} required />
               </label>
-              <label className="form-field">
+              <div className="form-field">
                 <span>채널</span>
-                <select name="channel" defaultValue={template.channel}>
-                  {channelOptions.map((channel) => (
-                    <option key={channel} value={channel}>
-                      {labelOf(templateChannelLabels, channel)}
-                    </option>
-                  ))}
-                </select>
-              </label>
+                <Select
+                  defaultValue={template.channel}
+                  name="channel"
+                  options={channelOptions.map((channel) => ({
+                    value: channel,
+                    label: labelOf(templateChannelLabels, channel),
+                  }))}
+                />
+              </div>
             </div>
             <label className="form-field textarea-field">
               <span>내용</span>

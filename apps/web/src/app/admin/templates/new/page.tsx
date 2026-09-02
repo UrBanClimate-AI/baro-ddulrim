@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AdminShell } from "@/components/admin-shell";
+import { Select } from "@/components/ui/select";
 import { labelOf, templateChannelLabels } from "@/lib/labels";
 import { createMessageTemplateAction } from "../actions";
 
@@ -35,16 +36,17 @@ export default function AdminTemplateNewPage() {
               <span>이름</span>
               <input name="name" placeholder="업체 배정 안내" required />
             </label>
-            <label className="form-field">
+            <div className="form-field">
               <span>채널</span>
-              <select name="channel" defaultValue="WEB">
-                {channelOptions.map((channel) => (
-                  <option key={channel} value={channel}>
-                    {labelOf(templateChannelLabels, channel)}
-                  </option>
-                ))}
-              </select>
-            </label>
+              <Select
+                defaultValue="WEB"
+                name="channel"
+                options={channelOptions.map((channel) => ({
+                  value: channel,
+                  label: labelOf(templateChannelLabels, channel),
+                }))}
+              />
+            </div>
           </div>
           <label className="form-field textarea-field">
             <span>내용</span>

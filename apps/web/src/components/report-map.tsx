@@ -1,5 +1,7 @@
 "use client";
 
+import { Select } from "@/components/ui/select";
+
 import { MapPin } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { MapProviderName, ReportMapMarker } from "@/lib/map-api";
@@ -424,40 +426,27 @@ export function ReportMap({
   return (
     <div className="report-map-layout">
       <div className="map-filter-bar" role="group" aria-label="지도 필터">
-        <select
-          aria-label="문제 유형 필터"
-          onChange={(event) => setIssueFilter(event.target.value)}
+        <Select
+          onChange={setIssueFilter}
+          options={[
+            { value: "ALL", label: "전체 유형" },
+            ...issueFilterOptions.map((issueType) => ({
+              value: issueType,
+              label: labelOf(issueTypeLabels, issueType),
+            })),
+          ]}
           value={issueFilter}
-        >
-          <option value="ALL">전체 유형</option>
-          {issueFilterOptions.map((issueType) => (
-            <option key={issueType} value={issueType}>
-              {labelOf(issueTypeLabels, issueType)}
-            </option>
-          ))}
-        </select>
-        <select
-          aria-label="처리 상태 필터"
-          onChange={(event) => setStatusFilter(event.target.value)}
+        />
+        <Select
+          onChange={setStatusFilter}
+          options={statusFilterOptions.map((o) => ({ value: o.value, label: o.label }))}
           value={statusFilter}
-        >
-          {statusFilterOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        <select
-          aria-label="기간 필터"
-          onChange={(event) => setDateFilter(event.target.value)}
+        />
+        <Select
+          onChange={setDateFilter}
+          options={dateFilterOptions.map((o) => ({ value: o.value, label: o.label }))}
           value={dateFilter}
-        >
-          {dateFilterOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+        />
         <span className="map-filter-count">{validMarkers.length}건 표시</span>
         <div className="map-legend" aria-label="마커 범례">
           <span className="map-legend-item emergency">긴급</span>

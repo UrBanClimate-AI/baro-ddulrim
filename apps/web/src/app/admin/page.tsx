@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ClipboardCheck, Clock3, MapPinned, TimerReset, UsersRound } from "lucide-react";
 import { AdminShell } from "@/components/admin-shell";
+import { KpiGrid, KpiTile } from "@/components/ui/kpi";
 import { getDashboardSummary, getReports } from "@/lib/admin-api";
 import {
   channelLabels,
@@ -17,12 +18,6 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
   const [summary, reports] = await Promise.all([getDashboardSummary(), getReports()]);
-  const metrics = [
-    { label: "검수 대기", value: summary.adminReviewCount, icon: ClipboardCheck },
-    { label: "배분중", value: summary.biddingCount, icon: Clock3 },
-    { label: "활동 업체", value: summary.activeContractors, icon: UsersRound },
-    { label: "지도 마커", value: summary.mapMarkerCount, icon: MapPinned }
-  ];
   const recentReports = reports.slice(0, 5);
 
   return (
@@ -32,18 +27,29 @@ export default async function AdminPage() {
         <h1>운영 대시보드</h1>
       </header>
 
-      <section className="dashboard-grid">
-        {metrics.map((metric) => {
-          const Icon = metric.icon;
-          return (
-            <article className="metric" key={metric.label}>
-              <Icon aria-hidden="true" size={20} />
-              <span>{metric.label}</span>
-              <strong>{metric.value}</strong>
-            </article>
-          );
-        })}
-      </section>
+      <KpiGrid>
+        <KpiTile
+          icon={<ClipboardCheck aria-hidden="true" size={16} />}
+          label="검수 대기"
+          value={summary.adminReviewCount}
+        />
+        <KpiTile
+          icon={<Clock3 aria-hidden="true" size={16} />}
+          label="배분중"
+          value={summary.biddingCount}
+        />
+        <KpiTile
+          danger={summary.urgentCount > 0}
+          icon={<MapPinned aria-hidden="true" size={16} />}
+          label="긴급 신고"
+          value={summary.urgentCount}
+        />
+        <KpiTile
+          icon={<UsersRound aria-hidden="true" size={16} />}
+          label="활동 업체"
+          value={summary.activeContractors}
+        />
+      </KpiGrid>
 
       <section className="dashboard-grid compact">
         <article className="metric">

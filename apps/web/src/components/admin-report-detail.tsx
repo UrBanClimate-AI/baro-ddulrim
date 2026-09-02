@@ -4,6 +4,7 @@ import {
   approveReportAction,
   updateReportAction,
 } from "@/app/admin/reports/actions";
+import { Select } from "@/components/ui/select";
 import type { MessageTemplate, ReportDetail } from "@/lib/admin-api";
 import {
   actorLabels,
@@ -217,27 +218,31 @@ export function AdminReportReview({ report }: { report: ReportDetail }) {
                 <span>요약</span>
                 <input name="summary" defaultValue={report.summary ?? ""} />
               </label>
-              <label className="form-field">
+              <div className="form-field">
                 <span>유형</span>
-                <select name="issueType" defaultValue={report.issueType ?? ""}>
-                  <option value="">미정</option>
-                  {issueOptions.map((issueType) => (
-                    <option key={issueType} value={issueType}>
-                      {labelOf(issueTypeLabels, issueType)}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="form-field">
+                <Select
+                  defaultValue={report.issueType ?? ""}
+                  name="issueType"
+                  options={[
+                    { value: "", label: "미정" },
+                    ...issueOptions.map((issueType) => ({
+                      value: issueType,
+                      label: labelOf(issueTypeLabels, issueType),
+                    })),
+                  ]}
+                />
+              </div>
+              <div className="form-field">
                 <span>긴급도</span>
-                <select name="urgency" defaultValue={report.urgency}>
-                  {urgencyOptions.map((urgency) => (
-                    <option key={urgency} value={urgency}>
-                      {labelOf(urgencyLabels, urgency)}
-                    </option>
-                  ))}
-                </select>
-              </label>
+                <Select
+                  defaultValue={report.urgency}
+                  name="urgency"
+                  options={urgencyOptions.map((urgency) => ({
+                    value: urgency,
+                    label: labelOf(urgencyLabels, urgency),
+                  }))}
+                />
+              </div>
               <label className="form-field">
                 <span>장소명</span>
                 <input name="placeName" defaultValue={report.placeName ?? ""} />

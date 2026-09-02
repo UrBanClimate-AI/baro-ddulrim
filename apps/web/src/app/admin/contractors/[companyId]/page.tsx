@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AdminShell } from "@/components/admin-shell";
 import { CompanyActivityCards } from "@/components/company-activity";
+import { Select } from "@/components/ui/select";
 import { getAdminContractorCompanies, getCompanyActivity } from "@/lib/admin-api";
 import { contractorStatusLabels, formatDateTime, labelOf } from "@/lib/labels";
 import { updateContractorStatusAction } from "../actions";
@@ -112,16 +113,17 @@ export default async function AdminContractorDetailPage({
         <article className="panel-section">
           <h2>상태 변경</h2>
           <form action={updateStatus} className="admin-form compact-form">
-            <label className="form-field">
+            <div className="form-field">
               <span>상태</span>
-              <select name="status" defaultValue={company.status}>
-                {contractorStatuses.map((status) => (
-                  <option key={status} value={status}>
-                    {labelOf(contractorStatusLabels, status)}
-                  </option>
-                ))}
-              </select>
-            </label>
+              <Select
+                defaultValue={company.status}
+                name="status"
+                options={contractorStatuses.map((status) => ({
+                  value: status,
+                  label: labelOf(contractorStatusLabels, status),
+                }))}
+              />
+            </div>
             <label className="form-field">
               <span>상태 사유</span>
               <input

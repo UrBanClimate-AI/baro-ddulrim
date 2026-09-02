@@ -1,4 +1,5 @@
 import { AdminShell } from "@/components/admin-shell";
+import { Select } from "@/components/ui/select";
 import { getAppSettings } from "@/lib/admin-api";
 import { formatDateTime } from "@/lib/labels";
 import { updateSettingAction } from "./actions";
@@ -79,16 +80,14 @@ export default async function AdminSettingsPage() {
                 <p>{definition.description}</p>
               </div>
               <form action={updateSetting} className="admin-form compact-form">
-                <label className="form-field">
+                <div className="form-field">
                   <span>값</span>
-                  <select name="value" defaultValue={settingValue(settings, definition.key)}>
-                    {definition.options.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                  <Select
+                    defaultValue={settingValue(settings, definition.key)}
+                    name="value"
+                    options={definition.options}
+                  />
+                </div>
                 <div className="template-meta-row">
                   <span>최근 변경 {formatDateTime(settingUpdatedAt(settings, definition.key))}</span>
                 </div>
