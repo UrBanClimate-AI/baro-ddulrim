@@ -2,13 +2,11 @@ import Link from "next/link";
 import { ArrowLeft, MapPin } from "lucide-react";
 import {
   approveReportAction,
-  assignBidAction,
   updateReportAction,
 } from "@/app/admin/reports/actions";
 import type { MessageTemplate, ReportDetail } from "@/lib/admin-api";
 import {
   actorLabels,
-  bidStatusLabels,
   channelLabels,
   formatCurrency,
   formatDateTime,
@@ -306,20 +304,16 @@ export function AdminReportReview({ report }: { report: ReportDetail }) {
                 <dt>승인 시각</dt>
                 <dd>{formatDateTime(report.adminApprovedAt)}</dd>
               </div>
-              <div>
-                <dt>입찰 수</dt>
-                <dd>{report.bids.length}건</dd>
-              </div>
             </dl>
             {canApprove ? (
               <form action={approveReport} className="admin-form compact-form">
                 <label className="form-field">
                   <span>승인 사유</span>
-                  <input name="reason" placeholder="관리자 입찰 승인" />
+                  <input name="reason" placeholder="관리자 배분 승인" />
                 </label>
                 <div className="action-row">
                   <button className="primary-button" type="submit">
-                    입찰 승인
+                    배분 승인
                   </button>
                 </div>
               </form>
@@ -357,100 +351,6 @@ export function AdminReportReview({ report }: { report: ReportDetail }) {
           </div>
         ) : (
           <p className="empty-text">AI 분석 결과가 없습니다.</p>
-        )}
-      </section>
-    </>
-  );
-}
-
-export function AdminReportBids({
-  report,
-  templates,
-}: {
-  report: ReportDetail;
-  templates: MessageTemplate[];
-}) {
-  const activeWebTemplates = templates.filter(
-    (template) => template.isActive && template.channel === "WEB",
-  );
-  const canAssign = report.status === "BIDDING" && !report.assignment;
-  const assignBid = assignBidAction.bind(null, report.reportNo);
-
-  return (
-    <>
-      <section className="panel-section">
-        <div className="section-header">
-          <div>
-            <p className="eyebrow">업체</p>
-            <h2>입찰 목록</h2>
-          </div>
-        </div>
-        <div className="bid-grid">
-          {report.bids.map((bid) => (
-            <article className="bid-card" key={bid.id}>
-              <div>
-                <strong>{bid.contractorCompanyName}</strong>
-                <span className="status-badge">
-                  {labelOf(bidStatusLabels, bid.status)}
-                </span>
-              </div>
-              <dl className="info-list compact-list">
-                <div>
-                  <dt>견적</dt>
-                  <dd>{formatCurrency(bid.estimatedPrice)}</dd>
-                </div>
-                <div>
-                  <dt>출동 가능</dt>
-                  <dd>{formatDateTime(bid.availableTime)}</dd>
-                </div>
-              </dl>
-              <p>{bid.workNote ?? "작업 메모 없음"}</p>
-              <small>{bid.extraCostPolicy ?? "추가 비용 조건 없음"}</small>
-              {canAssign && bid.status === "SUBMITTED" ? (
-                <form action={assignBid} className="admin-form compact-form">
-                  <input name="bidId" type="hidden" value={bid.id} />
-                  <label className="form-field">
-                    <span>선택 사유</span>
-                    <input
-                      name="selectionReason"
-                      placeholder="견적과 출동 시간이 적합함"
-                    />
-                  </label>
-                  <label className="form-field">
-                    <span>고객 안내 템플릿</span>
-                    <select name="templateId" defaultValue="">
-                      <option value="">기본 템플릿</option>
-                      {activeWebTemplates.map((template) => (
-                        <option key={template.id} value={template.id}>
-                          {template.name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <button className="secondary-button" type="submit">
-                    이 업체 배정
-                  </button>
-                </form>
-              ) : null}
-            </article>
-          ))}
-          {report.bids.length === 0 ? (
-            <p className="empty-text">입찰 내역이 없습니다.</p>
-          ) : null}
-        </div>
-      </section>
-
-      <section className="panel-section">
-        <h2>배정 결과</h2>
-        {report.assignment ? (
-          <div className="assignment-box">
-            <strong>{report.assignment.contractorCompanyName}</strong>
-            <span>{formatDateTime(report.assignment.assignedAt)}</span>
-            <p>{report.assignment.selectionReason ?? "선택 사유 없음"}</p>
-            <small>{report.assignment.customerMessageRendered}</small>
-          </div>
-        ) : (
-          <p className="empty-text">아직 배정된 업체가 없습니다.</p>
         )}
       </section>
     </>

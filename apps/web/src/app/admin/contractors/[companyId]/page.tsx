@@ -142,7 +142,6 @@ export default async function AdminContractorDetailPage({
       <section className="panel-section">
         <h2>서류와 활동</h2>
         <div className="tag-row">
-          <span>입찰 {company.bidCount}</span>
           <span>배정 {company.assignmentCount}</span>
           <span>작업 {company.workUpdateCount}</span>
           {company.businessLicenseFileUrl ? (

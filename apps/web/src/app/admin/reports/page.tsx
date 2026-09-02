@@ -28,7 +28,7 @@ const statusFilters = [
       "CUSTOMER_INFO_REQUIRED"
     ]
   },
-  { key: "bidding", label: "입찰중", statuses: ["APPROVED_FOR_BIDDING", "BIDDING"] },
+  { key: "bidding", label: "배분중", statuses: ["APPROVED_FOR_BIDDING", "BIDDING", "AWAITING_ASSIGNMENT"] },
   {
     key: "working",
     label: "작업중",
@@ -152,8 +152,6 @@ export default async function AdminReportsPage({
                 <th>신고 내용</th>
                 <th>위치</th>
                 <th>상태</th>
-                <th>입찰</th>
-                <th>최저 견적</th>
                 <th>접수 시각</th>
               </tr>
             </thead>
@@ -182,8 +180,6 @@ export default async function AdminReportsPage({
                       {labelOf(statusLabels, report.status)}
                     </span>
                   </td>
-                  <td data-label="입찰">{report.bidCount}건</td>
-                  <td data-label="최저 견적">{formatCurrency(report.minEstimatedPrice)}</td>
                   <td data-label="접수 시각">{formatDateTime(report.createdAt)}</td>
                 </tr>
               ))}

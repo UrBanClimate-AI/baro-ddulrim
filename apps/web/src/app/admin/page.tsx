@@ -19,7 +19,7 @@ export default async function AdminPage() {
   const [summary, reports] = await Promise.all([getDashboardSummary(), getReports()]);
   const metrics = [
     { label: "검수 대기", value: summary.adminReviewCount, icon: ClipboardCheck },
-    { label: "입찰중", value: summary.biddingCount, icon: Clock3 },
+    { label: "배분중", value: summary.biddingCount, icon: Clock3 },
     { label: "활동 업체", value: summary.activeContractors, icon: UsersRound },
     { label: "지도 마커", value: summary.mapMarkerCount, icon: MapPinned }
   ];

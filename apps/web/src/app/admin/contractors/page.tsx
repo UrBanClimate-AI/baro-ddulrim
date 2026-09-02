@@ -91,7 +91,6 @@ export default async function AdminContractorsPage() {
                     </span>
                   </td>
                   <td data-label="활동">
-                    <span>입찰 {company.bidCount}</span>
                     <span>배정 {company.assignmentCount}</span>
                   </td>
                   <td data-label="승인">{formatDateTime(company.approvedAt)}</td>

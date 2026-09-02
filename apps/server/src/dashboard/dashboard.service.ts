@@ -99,9 +99,11 @@ export class DashboardService {
     const adminReviewCount =
       (statusCounts[ReportStatus.ADMIN_REVIEW] ?? 0) +
       (statusCounts[ReportStatus.CUSTOMER_INFO_REQUIRED] ?? 0);
+    // 배분중(제안 대기 포함) — 역경매 제거 후 AWAITING_ASSIGNMENT가 주 상태
     const biddingCount =
       (statusCounts[ReportStatus.APPROVED_FOR_BIDDING] ?? 0) +
-      (statusCounts[ReportStatus.BIDDING] ?? 0);
+      (statusCounts[ReportStatus.BIDDING] ?? 0) +
+      (statusCounts[ReportStatus.AWAITING_ASSIGNMENT] ?? 0);
     const assignedCount = reports.filter((report) => report.assignedAt).length;
     const resolvedCount = reports.filter((report) => report.resolvedAt).length;
 

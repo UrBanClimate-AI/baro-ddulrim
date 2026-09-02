@@ -3,8 +3,9 @@ export const statusLabels: Record<string, string> = {
   AI_ANALYZED: "AI 분석 완료",
   ADMIN_REVIEW: "관리자 검수중",
   CUSTOMER_INFO_REQUIRED: "추가질문 필요",
-  APPROVED_FOR_BIDDING: "입찰 승인",
-  BIDDING: "입찰중",
+  APPROVED_FOR_BIDDING: "배분 승인",
+  BIDDING: "배분중",
+  AWAITING_ASSIGNMENT: "배분 대기",
   ASSIGNED: "업체 배정",
   DISPATCH_SCHEDULED: "출동 예정",
   DISPATCHED: "출동 완료",
@@ -20,6 +21,7 @@ export function statusTone(status: string | null | undefined) {
   switch (status) {
     case "APPROVED_FOR_BIDDING":
     case "BIDDING":
+    case "AWAITING_ASSIGNMENT":
       return "tone-bidding";
     case "ASSIGNED":
     case "DISPATCH_SCHEDULED":
