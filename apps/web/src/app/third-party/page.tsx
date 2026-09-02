@@ -37,7 +37,7 @@ export default function ThirdPartyPage() {
       </p>
 
       <p>
-        입찰 단계의 협력업체에는 연락처가 제공되지 않으며, 배정이 확정된
+        배정 전 협력업체에는 연락처가 제공되지 않으며, 배정이 확정된
         업체에만 제공됩니다.
       </p>
     </LegalPage>
