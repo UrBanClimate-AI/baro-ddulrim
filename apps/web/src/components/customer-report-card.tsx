@@ -25,6 +25,7 @@ const stepIndexByStatus: Record<string, number> = {
   CUSTOMER_INFO_REQUIRED: 1,
   APPROVED_FOR_BIDDING: 2,
   BIDDING: 2,
+  AWAITING_ASSIGNMENT: 2,
   ASSIGNED: 3,
   DISPATCH_SCHEDULED: 3,
   DISPATCHED: 3,
@@ -41,8 +42,10 @@ const exceptionStatuses: Record<string, string> = {
 export function CustomerReportCard({ report }: { report: CustomerReport }) {
   const exceptionMessage = exceptionStatuses[report.status];
   const currentStep = stepIndexByStatus[report.status] ?? 1;
-  const isBiddingOpen =
-    report.status === "APPROVED_FOR_BIDDING" || report.status === "BIDDING";
+  const isDistributing =
+    report.status === "APPROVED_FOR_BIDDING" ||
+    report.status === "BIDDING" ||
+    report.status === "AWAITING_ASSIGNMENT";
 
   return (
     <article className="customer-report-card">
@@ -98,14 +101,10 @@ export function CustomerReportCard({ report }: { report: CustomerReport }) {
               "-"}
           </dd>
         </div>
-        {isBiddingOpen ? (
+        {isDistributing ? (
           <div>
-            <dt>견적</dt>
-            <dd>
-              {report.bidCount > 0
-                ? `업체 ${report.bidCount}곳이 견적을 제출했어요`
-                : "업체들의 견적을 기다리고 있어요"}
-            </dd>
+            <dt>진행</dt>
+            <dd>지역 업체에 배정을 진행하고 있어요</dd>
           </div>
         ) : null}
       </dl>
