@@ -190,7 +190,7 @@ export function ContractorNoCompanyScreen() {
       <Building2 aria-hidden="true" size={48} />
       <h2>등록된 업체가 없습니다</h2>
       <p>
-        먼저 업체 등록을 신청해 주세요. 관리자 승인 후 입찰에 참여할 수
+        먼저 업체 등록을 신청해 주세요. 관리자 승인 후 배정을 받을 수
         있습니다.
       </p>
       <div className="action-row">
