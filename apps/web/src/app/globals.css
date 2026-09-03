@@ -3842,3 +3842,36 @@ a.report-card.urgent:hover {
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
+
+/* ── 라우트 전환 로딩 ── */
+.route-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 60vh;
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.route-loading .route-spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid var(--color-line-strong);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: route-spin 0.8s linear infinite;
+}
+
+@keyframes route-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-loading .route-spinner {
+    animation: none;
+  }
+}

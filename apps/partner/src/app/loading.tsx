@@ -1,8 +1,9 @@
-export default function Loading() {
+/** 파트너 라우트 전환 중 즉시 표시되는 로딩 화면. */
+export default function PartnerLoading() {
   return (
-    <div className="loading-screen" aria-label="로딩 중">
-      <span className="spinner" aria-hidden="true" />
-      <p>잠시만 기다려주세요...</p>
+    <div className="route-loading">
+      <span aria-hidden="true" className="route-spinner" />
+      불러오는 중…
     </div>
   );
 }
