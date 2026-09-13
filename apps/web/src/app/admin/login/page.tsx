@@ -37,7 +37,7 @@ export default function AdminLoginPage() {
       <section className="auth-card">
         <div className="brand-row">
           <div>
-            <p className="eyebrow">바로 뚫림</p>
+            <p className="eyebrow">하수구랩</p>
             <strong>관리자 로그인</strong>
           </div>
         </div>

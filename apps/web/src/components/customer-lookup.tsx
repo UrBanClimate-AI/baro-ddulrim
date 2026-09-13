@@ -57,7 +57,7 @@ export function CustomerLookup({
       <section className="customer-panel" aria-labelledby="lookup-title">
         <div className="brand-row">
           <div>
-            <p className="eyebrow">바로 뚫림</p>
+            <p className="eyebrow">하수구랩</p>
             <h1 id="lookup-title">내 신고 확인</h1>
           </div>
         </div>

@@ -1,12 +1,12 @@
 import { LegalPage } from "@/components/legal-page";
 
-export const metadata = { title: "제3자 정보 제공 동의 · 바로 뚫림" };
+export const metadata = { title: "제3자 정보 제공 동의 · 하수구랩" };
 
 export default function ThirdPartyPage() {
   return (
     <LegalPage title="개인정보 제3자 제공 동의" updated="2026년 7월 24일">
       <p>
-        바로 뚫림은 신고하신 배수 문제의 시공을 위해 아래와 같이 개인정보를
+        하수구랩은 신고하신 배수 문제의 시공을 위해 아래와 같이 개인정보를
         제3자에게 제공합니다.
       </p>
 

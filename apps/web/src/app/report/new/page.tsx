@@ -12,9 +12,9 @@ export default function NewReportPage() {
     <main className="shell report-shell">
       <section className="customer-panel" aria-labelledby="report-title">
         <div className="brand-row">
-          <Image src="/character.png" alt="바로뚫림 캐릭터" width={56} height={56} style={{ objectFit: 'contain' }} priority />
+          <Image src="/character.png" alt="하수구랩 캐릭터" width={56} height={56} style={{ objectFit: 'contain' }} priority />
           <div>
-            <p className="eyebrow">바로 뚫림</p>
+            <p className="eyebrow">하수구랩</p>
             <h1 id="report-title">배수 문제 신고</h1>
           </div>
         </div>

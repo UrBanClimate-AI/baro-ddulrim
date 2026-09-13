@@ -1,6 +1,6 @@
 import { LegalPage } from "@/components/legal-page";
 
-export const metadata = { title: "개인정보 처리방침 · 바로 뚫림" };
+export const metadata = { title: "개인정보 처리방침 · 하수구랩" };
 
 export default function PrivacyPage() {
   return (

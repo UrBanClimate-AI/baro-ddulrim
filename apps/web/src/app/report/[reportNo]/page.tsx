@@ -63,7 +63,7 @@ export default async function CustomerReportDetailPage({
             </div>
             <CopyButton
               label="접수번호·확인번호 복사"
-              value={`바로 뚫림 접수번호 ${report.reportNo} / 확인번호 ${verificationCode}`}
+              value={`하수구랩 접수번호 ${report.reportNo} / 확인번호 ${verificationCode}`}
             />
           </div>
         ) : null}

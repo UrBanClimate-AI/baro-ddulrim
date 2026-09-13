@@ -17,7 +17,7 @@ const gothic = Gothic_A1({
 });
 
 export const metadata: Metadata = {
-  title: "바로 뚫림",
+  title: "하수구랩",
   description: "배수 문제 신고 접수 및 업체 배정 플랫폼"
 };
 

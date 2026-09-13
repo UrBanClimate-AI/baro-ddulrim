@@ -1,6 +1,6 @@
 import { LegalPage } from "@/components/legal-page";
 
-export const metadata = { title: "서비스 이용약관 · 바로 뚫림" };
+export const metadata = { title: "서비스 이용약관 · 하수구랩" };
 
 export default function TermsPage() {
   return (
@@ -8,7 +8,7 @@ export default function TermsPage() {
       <h2>제1조 (목적)</h2>
       <p>
         본 약관은 어반클라이밋에이아이(이하 &ldquo;회사&rdquo;)가 운영하는
-        배수 문제 신고·업체 중개 서비스 &ldquo;바로 뚫림&rdquo;(이하
+        배수 문제 신고·업체 중개 서비스 &ldquo;하수구랩&rdquo;(이하
         &ldquo;서비스&rdquo;)의 이용 조건과 회사·이용자 간 권리와 의무를
         정하는 것을 목적으로 합니다.
       </p>

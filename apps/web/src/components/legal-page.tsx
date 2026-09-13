@@ -13,7 +13,7 @@ export function LegalPage({
 }) {
   return (
     <main className="legal-main">
-      <p className="eyebrow">바로 뚫림</p>
+      <p className="eyebrow">하수구랩</p>
       <h1>{title}</h1>
       <p className="legal-updated">시행일: {updated}</p>
       <div className="legal-body">{children}</div>

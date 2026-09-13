@@ -47,7 +47,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
       />
       <div className="console-main">
         <header className="command-bar">
-          <h1 className="cmd-title">바로 뚫림 관제</h1>
+          <h1 className="cmd-title">하수구랩 관제</h1>
           <span className="cmd-sub">실시간 운영 현황</span>
           <div className="cmd-right">
             <Suspense
