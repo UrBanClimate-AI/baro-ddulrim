@@ -1,6 +1,6 @@
 import { LegalPage } from "@/components/legal-page";
 
-export const metadata = { title: "파트너 이용약관 · 바로 뚫림" };
+export const metadata = { title: "파트너 이용약관 · 하수구랩" };
 
 export default function PartnerTermsPage() {
   return (
@@ -8,7 +8,7 @@ export default function PartnerTermsPage() {
       <h2>제1조 (목적)</h2>
       <p>
         본 약관은 어반클라이밋에이아이(이하 &ldquo;회사&rdquo;)가 운영하는
-        &ldquo;바로 뚫림&rdquo; 서비스에서 협력업체(이하
+        &ldquo;하수구랩&rdquo; 서비스에서 협력업체(이하
         &ldquo;파트너&rdquo;)의 가입, 배정, 작업 수행에 관한 조건을
         정합니다.
       </p>

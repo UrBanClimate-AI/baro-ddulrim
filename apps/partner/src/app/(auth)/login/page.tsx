@@ -41,7 +41,7 @@ export default function ContractorLoginPage() {
   return (
     <div className="auth-body">
       <h1 className="auth-title">업체 로그인</h1>
-      <p className="auth-subtitle">바로 뚫림 업체 작업대에 로그인하세요.</p>
+      <p className="auth-subtitle">하수구랩 업체 작업대에 로그인하세요.</p>
 
       <AuthOAuthButtons next="/" />
 

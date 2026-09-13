@@ -78,7 +78,7 @@ export function ContractorShell({
       <div className="console-main">
         <header className="command-bar">
           <h1 className="cmd-title">{title}</h1>
-          <span className="cmd-sub">바로 뚫림 파트너</span>
+          <span className="cmd-sub">하수구랩 파트너</span>
           <div className="cmd-right">{barExtra}</div>
         </header>
         <div className="console-body">{children}</div>

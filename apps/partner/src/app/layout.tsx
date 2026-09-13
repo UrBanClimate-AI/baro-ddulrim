@@ -17,7 +17,7 @@ const gothic = Gothic_A1({
 });
 
 export const metadata: Metadata = {
-  title: "바로 뚫림 · 업체",
+  title: "하수구랩 · 업체",
   description: "배수 작업 업체 배정 및 작업 관리"
 };
 

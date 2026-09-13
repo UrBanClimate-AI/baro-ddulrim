@@ -31,9 +31,9 @@ export default async function ContractorPage() {
       <main className="workspace-page contractor-page">
         <header className="workspace-header">
           <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
-            <Image alt="바로뚫림 캐릭터" height={48} priority src="/character.png" style={{ objectFit: "contain" }} width={48} />
+            <Image alt="하수구랩 캐릭터" height={48} priority src="/character.png" style={{ objectFit: "contain" }} width={48} />
             <div>
-              <p className="eyebrow" style={{ margin: 0, marginBottom: 4 }}>바로 뚫림 · 업체</p>
+              <p className="eyebrow" style={{ margin: 0, marginBottom: 4 }}>하수구랩 · 업체</p>
               <h1 style={{ margin: 0 }}>업체 작업대</h1>
             </div>
           </div>

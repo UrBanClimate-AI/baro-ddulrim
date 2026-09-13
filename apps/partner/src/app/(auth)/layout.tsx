@@ -7,9 +7,9 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
     <main className="auth-shell">
       <div className="auth-card">
         <Link className="auth-brand" href="/">
-          <Image src="/character.png" alt="바로뚫림 로고" width={48} height={48} style={{ objectFit: 'contain' }} priority />
+          <Image src="/character.png" alt="하수구랩 로고" width={48} height={48} style={{ objectFit: 'contain' }} priority />
           <span className="auth-brand-text">
-            <strong>바로 뚫림</strong>
+            <strong>하수구랩</strong>
             <small>업체 파트너</small>
           </span>
         </Link>
