@@ -3382,3 +3382,44 @@ h1, h2, h3 {
     animation: none;
   }
 }
+
+/* 회원가입 안내 (가입은 홈페이지 협력 제안으로 일원화) */
+.signup-guide {
+  margin: 18px 0 22px;
+  padding: 0;
+  list-style: none;
+  counter-reset: sg;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.signup-guide li {
+  counter-increment: sg;
+  position: relative;
+  padding-left: 38px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.signup-guide li::before {
+  content: counter(sg);
+  position: absolute;
+  left: 0;
+  top: 1px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--color-primary, #1e9bd7);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+}
+.signup-guide li b { font-size: 15px; }
+.signup-guide li span { font-size: 13.5px; color: var(--color-muted, #6b7280); }
+.signup-cta {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+}

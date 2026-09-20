@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { AuthOAuthButtons } from "@/components/auth-oauth-buttons";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export default function ContractorLoginPage() {
@@ -41,13 +40,10 @@ export default function ContractorLoginPage() {
   return (
     <div className="auth-body">
       <h1 className="auth-title">업체 로그인</h1>
-      <p className="auth-subtitle">하수구랩 업체 작업대에 로그인하세요.</p>
-
-      <AuthOAuthButtons next="/" />
-
-      <div className="auth-divider">
-        <span>또는 이메일로 로그인</span>
-      </div>
+      <p className="auth-subtitle">
+        하수구랩 업체 작업대에 로그인하세요. 아이디는 협력 제안 때 등록한
+        이메일입니다.
+      </p>
 
       <form className="admin-form" onSubmit={onSubmit}>
         <label className="form-field">
