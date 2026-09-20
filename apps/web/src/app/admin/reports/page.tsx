@@ -77,11 +77,7 @@ export default async function AdminReportsPage({
   const visible = reports.filter(
     (report) =>
       matchesDateRange(report, from, to) &&
-      (channel === "CONSULT"
-        ? report.channel !== "WEB" && report.channel !== "APP"
-        : channel
-          ? report.channel === channel
-          : true)
+      (channel ? report.channel === channel : true)
   );
 
   const channelQuery = (value?: string) => {
@@ -95,10 +91,8 @@ export default async function AdminReportsPage({
   const channelChips = [
     { value: undefined, label: "전체" },
     { value: "WEB", label: "웹" },
-    { value: "CONSULT", label: "상담 접수 (수동 배정)" },
     { value: "AI_CALL", label: "AI 전화" },
-    { value: "KAKAO", label: "카카오톡" },
-    { value: "PHONE", label: "전화" }
+    { value: "KAKAO", label: "카카오톡" }
   ] as const;
 
   return (
@@ -108,18 +102,19 @@ export default async function AdminReportsPage({
         <h1>신고 보드</h1>
       </header>
 
-      <ReportDateFilter from={from} status="all" to={to} />
-
-      <div className="mode-tabs" aria-label="접수 채널" style={{ marginTop: 12 }}>
-        {channelChips.map((chip) => (
-          <Link
-            className={`mode-tab${(channel ?? undefined) === chip.value ? " active" : ""}`}
-            href={channelQuery(chip.value)}
-            key={chip.label}
-          >
-            {chip.label}
-          </Link>
-        ))}
+      <div className="report-filterbar-row">
+        <ReportDateFilter channel={channel} from={from} status="all" to={to} />
+        <div className="mode-tabs channel-tabs" aria-label="접수 채널">
+          {channelChips.map((chip) => (
+            <Link
+              className={`mode-tab${(channel ?? undefined) === chip.value ? " active" : ""}`}
+              href={channelQuery(chip.value)}
+              key={chip.label}
+            >
+              {chip.label}
+            </Link>
+          ))}
+        </div>
       </div>
 
       <div className="kanban-board cols-5" style={{ marginTop: 16 }}>

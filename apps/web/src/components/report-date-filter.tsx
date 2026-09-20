@@ -13,10 +13,12 @@ export function ReportDateFilter({
   status,
   from,
   to,
+  channel,
 }: {
   status: string;
   from?: string;
   to?: string;
+  channel?: string;
 }) {
   const router = useRouter();
   const [fromValue, setFromValue] = useState(from ?? "");
@@ -35,6 +37,10 @@ export function ReportDateFilter({
 
     if (toDate) {
       query.set("to", toDate);
+    }
+
+    if (channel) {
+      query.set("channel", channel);
     }
 
     const text = query.toString();

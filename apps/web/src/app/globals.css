@@ -4050,3 +4050,25 @@ a.report-card.urgent:hover {
 /* 위치 상세 입력 */
 .location-detail-label { margin-top: 10px; }
 .location-detail-label small { font-weight: 600; color: var(--color-muted); }
+
+/* 신고 보드 상단 필터 줄 — 기간 + 채널을 한 줄에 */
+.report-filterbar-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 12px;
+}
+.report-filterbar-row .channel-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: auto;
+  grid-template-columns: none;
+  margin: 0;
+  padding: 6px 8px;
+}
+.report-filterbar-row .channel-tabs .mode-tab {
+  padding: 8px 16px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
