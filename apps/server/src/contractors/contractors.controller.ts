@@ -16,6 +16,7 @@ import { CurrentAccount } from "../auth/auth.decorators";
 import type { AuthAccount } from "../auth/auth.types";
 import { ContractorGuard } from "../auth/contractor.guard";
 import { ContractorsService } from "./contractors.service";
+import { ApplyContractorDto } from "./dto/apply-contractor.dto";
 import { RegisterContractorDto } from "./dto/register-contractor.dto";
 import { SubmitBidDto } from "./dto/submit-bid.dto";
 import { SubmitWorkUpdateDto } from "./dto/submit-work-update.dto";
@@ -36,6 +37,12 @@ export class ContractorsController {
   @Get("public-board")
   async findPublicBoard() {
     return this.contractorsService.findPublicBoard();
+  }
+
+  /** 홈페이지 협력 제안 접수 (비인증 공개) — 접수와 동시에 파트너 계정 생성 */
+  @Post("apply")
+  async applyPartner(@Body() dto: ApplyContractorDto) {
+    return this.contractorsService.applyPartner(dto);
   }
 
   @Get("me")

@@ -17,6 +17,7 @@ import { NotificationsService } from "../notifications/notifications.service";
 import { PrismaService } from "../prisma/prisma.service";
 import { RegionsService } from "../regions/regions.service";
 import { sanitizeSpecialties } from "./contractor-specialties";
+import { ApplyContractorDto } from "./dto/apply-contractor.dto";
 import { RegisterContractorDto } from "./dto/register-contractor.dto";
 import { SubmitBidDto } from "./dto/submit-bid.dto";
 import { SubmitWorkUpdateDto } from "./dto/submit-work-update.dto";
@@ -304,6 +305,118 @@ export class ContractorsService {
     });
 
     return companies.map((company) => this.serializeCompany(company));
+  }
+
+  /**
+   * 홈페이지 협력 제안 폼 접수 — 접수와 동시에 파트너 계정을 만든다.
+   * 아이디 = 이메일, 초기 비밀번호 = 연락처 숫자('-' 제거).
+   * Supabase user_metadata.must_change_password 로 첫 로그인 시 비밀번호 변경을 강제한다.
+   */
+  async applyPartner(dto: ApplyContractorDto) {
+    const email = this.requireCleanString(dto.email, "이메일을 입력해 주세요.").toLowerCase();
+    const phone = this.requireCleanString(dto.phone, "연락처를 입력해 주세요.");
+    const companyName = this.requireCleanString(dto.company, "업체명을 입력해 주세요.");
+    const representativeName = this.requireCleanString(dto.ceo, "대표자 이름을 입력해 주세요.");
+    const businessNumber = this.requireCleanString(dto.bizno, "사업자 번호를 입력해 주세요.");
+
+    const phoneDigits = phone.replace(/\D/g, "");
+    if (phoneDigits.length < 8) {
+      throw new BadRequestException("연락처를 숫자 8자리 이상으로 입력해 주세요.");
+    }
+
+    const [existingAccount, existingCompany] = await Promise.all([
+      this.prisma.contractorAccount.findUnique({ where: { email } }),
+      this.prisma.contractorCompany.findUnique({ where: { businessNumber } })
+    ]);
+    if (existingAccount) {
+      throw new ConflictException(
+        "이미 등록된 이메일입니다. partner.hasugulab.com 에서 로그인해 주세요."
+      );
+    }
+    if (existingCompany) {
+      throw new ConflictException("이미 등록된 사업자 번호입니다.");
+    }
+
+    const supabaseUrl = this.config.get<string>("SUPABASE_URL");
+    const serviceRoleKey = this.config.get<string>("SUPABASE_SERVICE_ROLE_KEY");
+    if (!supabaseUrl || !serviceRoleKey) {
+      throw new BadRequestException("계정 생성 설정이 누락되었습니다. 관리자에게 문의해 주세요.");
+    }
+    const supabase = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { autoRefreshToken: false, persistSession: false }
+    });
+
+    const { data: created, error: createError } = await supabase.auth.admin.createUser({
+      email,
+      password: phoneDigits,
+      email_confirm: true,
+      user_metadata: { must_change_password: true, source: "partner_apply" }
+    });
+    if (createError || !created?.user) {
+      const alreadyExists = createError?.message?.toLowerCase().includes("registered");
+      throw alreadyExists
+        ? new ConflictException(
+            "이미 등록된 이메일입니다. partner.hasugulab.com 에서 로그인해 주세요."
+          )
+        : new BadRequestException("계정 생성에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+    }
+
+    const regionText = [dto.sido, dto.sigungu]
+      .map((v) => this.cleanString(v))
+      .filter(Boolean)
+      .join(" ");
+    const descriptionLines = [
+      "[홈페이지 협력 제안]",
+      dto.sector ? `주력 분야: ${dto.sector}` : null,
+      dto.stages ? `가능 단계: ${dto.stages}` : null,
+      dto.equip ? `보유 장비: ${dto.equip}` : null,
+      dto.work ? `가능 작업: ${dto.work}` : null,
+      dto.orgType ? `사업 형태: ${dto.orgType}` : null,
+      dto.orgSize || dto.staff ? `규모/인원: ${[dto.orgSize, dto.staff].filter(Boolean).join(" / ")}` : null,
+      dto.type ? `참여 형태: ${dto.type}` : null,
+      dto.insurance ? `보험 여부: ${dto.insurance}` : null,
+      dto.message ? `전하고 싶은 말: ${dto.message}` : null
+    ].filter(Boolean);
+
+    try {
+      const company = await this.prisma.$transaction(async (tx) => {
+        const account = await tx.contractorAccount.create({
+          data: {
+            authUserId: created.user.id,
+            email,
+            name: this.cleanString(dto.manager) ?? representativeName,
+            phone
+          }
+        });
+
+        return tx.contractorCompany.create({
+          data: {
+            accountId: account.id,
+            companyName,
+            representativeName,
+            businessNumber,
+            address: regionText || null,
+            serviceRegions: regionText ? [regionText] : [],
+            serviceRadiusKm: toNumber(dto.radius) ?? null,
+            yearsOfExperience: toNumber(dto.years) ?? null,
+            specialties: sanitizeSpecialties(dto.sector),
+            description: descriptionLines.join("\n"),
+            status: ContractorStatus.REVIEWING,
+            statusReason: "홈페이지 협력 제안 접수"
+          }
+        });
+      });
+
+      return {
+        ok: true,
+        no: `P-${company.id.slice(-6).toUpperCase()}`,
+        email
+      };
+    } catch (error) {
+      // DB 저장 실패 시 방금 만든 인증 계정을 정리해 재시도 가능 상태로 되돌린다.
+      await supabase.auth.admin.deleteUser(created.user.id).catch(() => undefined);
+      throw error;
+    }
   }
 
   /**

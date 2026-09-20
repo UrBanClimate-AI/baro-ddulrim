@@ -1,13 +1,25 @@
 import Link from "next/link";
-import { ArrowRight, Phone } from "lucide-react";
+import { ArrowRight, ClipboardCheck, Phone } from "lucide-react";
 import { createCustomerReportAction } from "@/app/actions";
 import { LocationSearchInput } from "@/components/location-search-input";
 import { PendingOverlay } from "@/components/pending-overlay";
 import { ReportPhotoUploader } from "@/components/report-photo-uploader";
 import { SubmitButton } from "@/components/submit-button";
 import Image from "next/image";
+import { diagDescription, diagFlagLabels, diagUrgency, parseDiag } from "./diag";
 
-export default function NewReportPage() {
+export default async function NewReportPage({
+  searchParams
+}: {
+  searchParams: Promise<{ diag?: string }>;
+}) {
+  const { diag: rawDiag } = await searchParams;
+  const diag = parseDiag(rawDiag);
+  const defaultDescription = diag ? diagDescription(diag) : undefined;
+  const defaultUrgency = diag ? diagUrgency(diag) : "NORMAL";
+  const won = (n: number | undefined) =>
+    typeof n === "number" ? n.toLocaleString("ko-KR") : null;
+
   return (
     <main className="shell report-shell">
       <section className="customer-panel" aria-labelledby="report-title">
@@ -28,6 +40,43 @@ export default function NewReportPage() {
           </Link>
         </div>
 
+        {diag ? (
+          <aside className="diag-card" aria-label="자가 진단 결과">
+            <div className="diag-head">
+              <ClipboardCheck aria-hidden="true" size={18} />
+              <strong>자가 진단 결과가 담긴 접수입니다</strong>
+            </div>
+            <dl>
+              {diag.place ? (
+                <>
+                  <dt>장소</dt>
+                  <dd>
+                    {diag.place.label}
+                    {diag.point ? ` / ${diag.point.spaceLabel} · ${diag.point.label}` : ""}
+                  </dd>
+                </>
+              ) : null}
+              {diag.stageName ? (
+                <>
+                  <dt>추정 단계</dt>
+                  <dd>
+                    {diag.stageName}
+                    {won(diag.lo) && won(diag.hi)
+                      ? ` · 예상 ${won(diag.lo)}~${won(diag.hi)}원 (부가세 별도)`
+                      : ""}
+                  </dd>
+                </>
+              ) : null}
+            </dl>
+            {diagFlagLabels(diag).length ? (
+              <p className="diag-flags">{diagFlagLabels(diag).join(" · ")}</p>
+            ) : null}
+            <p className="diag-note">
+              아래 증상란에 진단 내용이 채워져 있어요. 상세 상황만 덧붙이고 접수하시면 됩니다.
+            </p>
+          </aside>
+        ) : null}
+
         <form action={createCustomerReportAction} className="report-form">
           <PendingOverlay message="신고를 정리하고 있어요. 잠시만 기다려 주세요." />
           <label htmlFor="phone">연락처</label>
@@ -47,32 +96,48 @@ export default function NewReportPage() {
 
           <label htmlFor="description">증상</label>
           <textarea
+            defaultValue={defaultDescription}
             id="description"
             name="description"
             placeholder="역류, 침수, 악취 등 현재 상황"
             required
-            rows={5}
+            rows={diag ? 10 : 5}
           />
 
           <fieldset className="urgency-choice">
             <legend>얼마나 급한가요?</legend>
             <div className="urgency-options">
               <label className="urgency-option">
-                <input defaultChecked name="urgency" type="radio" value="NORMAL" />
+                <input
+                  defaultChecked={defaultUrgency === "NORMAL"}
+                  name="urgency"
+                  type="radio"
+                  value="NORMAL"
+                />
                 <span>
                   <strong>보통</strong>
                   <small>며칠 안에 처리되면 돼요</small>
                 </span>
               </label>
               <label className="urgency-option">
-                <input name="urgency" type="radio" value="URGENT" />
+                <input
+                  defaultChecked={defaultUrgency === "URGENT"}
+                  name="urgency"
+                  type="radio"
+                  value="URGENT"
+                />
                 <span>
                   <strong>급함</strong>
                   <small>오늘 안에 봐주세요</small>
                 </span>
               </label>
               <label className="urgency-option">
-                <input name="urgency" type="radio" value="EMERGENCY" />
+                <input
+                  defaultChecked={defaultUrgency === "EMERGENCY"}
+                  name="urgency"
+                  type="radio"
+                  value="EMERGENCY"
+                />
                 <span>
                   <strong>긴급</strong>
                   <small>지금 물이 넘치고 있어요</small>

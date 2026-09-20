@@ -3875,3 +3875,47 @@ a.report-card.urgent:hover {
     animation: none;
   }
 }
+
+/* 자가 진단 결과 카드 (hasugulab.com/check.html → ?diag= 접수) */
+.diag-card {
+  margin: 18px 0 4px;
+  padding: 16px 18px;
+  border: 1px solid #bfe3f5;
+  border-radius: 14px;
+  background: #f2fafe;
+}
+.diag-card .diag-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-primary-dark);
+  font-size: 15px;
+  margin-bottom: 10px;
+}
+.diag-card dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 14px;
+  margin: 0;
+  font-size: 14px;
+}
+.diag-card dt {
+  color: var(--color-muted);
+  font-weight: 600;
+}
+.diag-card dd {
+  margin: 0;
+  color: var(--color-text);
+  font-weight: 600;
+}
+.diag-card .diag-flags {
+  margin: 10px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #b45309;
+}
+.diag-card .diag-note {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--color-muted);
+}

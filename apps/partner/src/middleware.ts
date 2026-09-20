@@ -52,6 +52,16 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(signupUrl);
   }
 
+  // 홈페이지 협력 제안으로 만들어진 계정(초기 비밀번호=연락처)은
+  // 안전한 비밀번호로 바꾸기 전까지 비밀번호 변경 화면만 쓸 수 있다.
+  if (
+    user &&
+    user.user_metadata?.must_change_password === true &&
+    path !== "/change-password"
+  ) {
+    return NextResponse.redirect(new URL("/change-password", request.url));
+  }
+
   if (user && redirectIfAuthed.includes(path)) {
     const homeUrl = new URL("/", request.url);
     return NextResponse.redirect(homeUrl);
