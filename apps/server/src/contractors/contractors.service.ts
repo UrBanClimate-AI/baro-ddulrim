@@ -1137,6 +1137,7 @@ export class ContractorsService {
       description: string | null;
       customerPhone: string;
       addressText: string | null;
+      addressDetail: string | null;
       roadAddressText: string | null;
       placeName: string | null;
       latitude: Parameters<typeof toNumber>[0];
@@ -1184,6 +1185,8 @@ export class ContractorsService {
         // 배정된 업체에게만 고객 연락처를 공개한다.
         customerPhone: assignment.report.customerPhone,
         addressText: assignment.report.addressText,
+        // 동·호수 등 상세 위치도 배정된 업체에게만 공개한다.
+        addressDetail: assignment.report.addressDetail,
         roadAddressText: assignment.report.roadAddressText,
         placeName: assignment.report.placeName,
         latitude: toNumber(assignment.report.latitude),

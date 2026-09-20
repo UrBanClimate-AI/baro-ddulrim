@@ -99,6 +99,7 @@ export function CustomerReportCard({ report }: { report: CustomerReport }) {
               report.roadAddressText ??
               report.addressText ??
               "-"}
+            {report.addressDetail ? ` · ${report.addressDetail}` : ""}
           </dd>
         </div>
         {isDistributing ? (

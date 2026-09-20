@@ -21,6 +21,11 @@ export class CreateCustomerReportDto {
   @MaxLength(200)
   location!: string;
 
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  addressDetail?: string | null;
+
   @IsString()
   description!: string;
 

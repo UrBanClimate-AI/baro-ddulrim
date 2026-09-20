@@ -37,6 +37,7 @@ export type ReportListItem = {
   summary: string | null;
   description: string | null;
   addressText: string | null;
+  addressDetail: string | null;
   roadAddressText: string | null;
   placeName: string | null;
   latitude: number | null;
@@ -105,6 +106,7 @@ export type ReportDetail = ReportListItem & {
     provider: string;
     title: string;
     addressText: string | null;
+    addressDetail: string | null;
     roadAddressText: string | null;
     placeName: string | null;
     category: string | null;

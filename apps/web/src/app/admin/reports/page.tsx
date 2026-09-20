@@ -129,6 +129,7 @@ export default async function AdminReportsPage({
                     <span className="rc-title">{report.summary ?? "요약 없음"}</span>
                     <span className="rc-sub">
                       {report.placeName ?? report.roadAddressText ?? report.addressText ?? "-"}
+                      {report.addressDetail ? ` · ${report.addressDetail}` : ""}
                     </span>
                     <span className="rc-foot">
                       <span>{labelOf(channelLabels, report.channel)}</span>

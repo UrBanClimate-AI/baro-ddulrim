@@ -178,6 +178,7 @@ model Report {
   description             String?              @db.Text
   customerPhone           String
   addressText             String?
+  addressDetail           String? // 동·호수 등 상세 위치 (고객 직접 입력)
   roadAddressText         String?
   placeName               String?
   latitude                Decimal?             @db.Decimal(10, 7)

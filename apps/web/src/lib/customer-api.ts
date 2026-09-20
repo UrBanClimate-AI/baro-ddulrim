@@ -8,6 +8,7 @@ export type CustomerReport = {
   summary: string | null;
   description: string | null;
   addressText: string | null;
+  addressDetail: string | null;
   roadAddressText: string | null;
   placeName: string | null;
   latitude: number | null;

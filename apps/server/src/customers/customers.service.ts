@@ -70,6 +70,7 @@ export class CustomersService {
       summary: report.summary,
       description: report.description,
       addressText: report.addressText,
+      addressDetail: report.addressDetail,
       roadAddressText: report.roadAddressText,
       placeName: report.placeName,
       latitude: toNumber(report.latitude),

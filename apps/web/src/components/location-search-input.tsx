@@ -153,6 +153,20 @@ export function LocationSearchInput() {
         </button>
       </div>
 
+      <label className="location-detail-label" htmlFor="addressDetail">
+        상세 위치 <small>(동·호수·층 등, 선택)</small>
+      </label>
+      <div className="input-row">
+        <input
+          autoComplete="off"
+          id="addressDetail"
+          maxLength={120}
+          name="addressDetail"
+          placeholder="예: 101동 1204호 / 지하 1층 주방"
+          type="text"
+        />
+      </div>
+
       <input name="placeName" type="hidden" value={selected?.placeName ?? ""} />
       <input
         name="roadAddressText"

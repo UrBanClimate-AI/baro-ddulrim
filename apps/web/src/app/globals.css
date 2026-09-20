@@ -4046,3 +4046,7 @@ a.report-card.urgent:hover {
 }
 .sym-detail > span { font-weight: 700; font-size: 15px; }
 .sym-detail > span small { font-weight: 600; color: var(--color-muted); }
+
+/* 위치 상세 입력 */
+.location-detail-label { margin-top: 10px; }
+.location-detail-label small { font-weight: 600; color: var(--color-muted); }

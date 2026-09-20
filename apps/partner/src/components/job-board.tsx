@@ -29,12 +29,14 @@ function columnOf(assignment: ContractorAssignment): ColumnKey {
 }
 
 function placeOf(assignment: ContractorAssignment) {
-  return (
+  const base =
     assignment.report.placeName ??
     assignment.report.roadAddressText ??
     assignment.report.addressText ??
-    "-"
-  );
+    "-";
+  return assignment.report.addressDetail
+    ? `${base} · ${assignment.report.addressDetail}`
+    : base;
 }
 
 function finalPriceOf(assignment: ContractorAssignment) {

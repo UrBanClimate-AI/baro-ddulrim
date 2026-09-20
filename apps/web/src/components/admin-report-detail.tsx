@@ -152,7 +152,10 @@ export function AdminReportOverview({ report }: { report: ReportDetail }) {
           <div className="location-box">
             <MapPin aria-hidden="true" size={20} />
             <div>
-              <strong>{report.placeName ?? report.addressText ?? "-"}</strong>
+              <strong>
+                {report.placeName ?? report.addressText ?? "-"}
+                {report.addressDetail ? ` · ${report.addressDetail}` : ""}
+              </strong>
               <span>{report.roadAddressText ?? report.addressText ?? "-"}</span>
               <small>
                 {report.latitude && report.longitude

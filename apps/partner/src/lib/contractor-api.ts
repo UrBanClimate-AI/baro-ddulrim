@@ -51,6 +51,7 @@ export type ContractorAssignment = {
     description: string | null;
     customerPhone: string;
     addressText: string | null;
+    addressDetail: string | null;
     roadAddressText: string | null;
     placeName: string | null;
     latitude: number | null;
