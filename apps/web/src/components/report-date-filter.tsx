@@ -14,11 +14,14 @@ export function ReportDateFilter({
   from,
   to,
   channel,
+  maxTo,
 }: {
   status: string;
   from?: string;
   to?: string;
   channel?: string;
+  /** 종료일 상한 (YYYY-MM-DD) — 오늘 이후 선택 방지 */
+  maxTo?: string;
 }) {
   const router = useRouter();
   const [fromValue, setFromValue] = useState(from ?? "");
@@ -66,6 +69,7 @@ export function ReportDateFilter({
       <label>
         <span>종료일</span>
         <input
+          max={maxTo}
           onChange={(event) => setToValue(event.target.value)}
           type="date"
           value={toValue}

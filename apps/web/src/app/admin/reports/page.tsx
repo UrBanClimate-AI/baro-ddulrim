@@ -69,8 +69,19 @@ export default async function AdminReportsPage({
   searchParams: Promise<{ status?: string; from?: string; to?: string; channel?: string }>;
 }) {
   const params = await searchParams;
-  const from = params.from?.trim() || undefined;
-  const to = params.to?.trim() || undefined;
+
+  // 기본 조회 기간: 최근 1개월 (KST). 사용자가 바꾸면 그대로 따르고,
+  // 종료일만 오늘 이후를 막는다.
+  const seoulDate = (date: Date) =>
+    date.toLocaleDateString("en-CA", { timeZone: "Asia/Seoul" });
+  const now = new Date();
+  const monthAgo = new Date(now);
+  monthAgo.setMonth(monthAgo.getMonth() - 1);
+  const today = seoulDate(now);
+
+  const from = params.from?.trim() || seoulDate(monthAgo);
+  const rawTo = params.to?.trim() || today;
+  const to = rawTo > today ? today : rawTo;
   const channel = params.channel?.trim() || undefined;
 
   const reports = await getReports();
@@ -103,7 +114,7 @@ export default async function AdminReportsPage({
       </header>
 
       <div className="report-filterbar-row">
-        <ReportDateFilter channel={channel} from={from} status="all" to={to} />
+        <ReportDateFilter channel={channel} from={from} maxTo={today} status="all" to={to} />
         <div className="mode-tabs channel-tabs" aria-label="접수 채널">
           {channelChips.map((chip) => (
             <Link
