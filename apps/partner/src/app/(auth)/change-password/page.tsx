@@ -40,19 +40,52 @@ export default function ChangePasswordPage() {
     }
 
     const supabase = createSupabaseBrowserClient();
-    const { error: updateError } = await supabase.auth.updateUser({
-      password,
-      data: { must_change_password: false }
-    });
+    const withTimeout = <T,>(promise: Promise<T>, ms: number) =>
+      Promise.race<T>([
+        promise,
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("TIMEOUT")), ms)
+        )
+      ]);
 
-    if (updateError) {
-      setError("변경에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+    try {
+      const { error: updateError } = await withTimeout(
+        supabase.auth.updateUser({
+          password,
+          data: { must_change_password: false }
+        }),
+        15000
+      );
+
+      if (updateError) {
+        setError(
+          updateError.message.toLowerCase().includes("different from the old")
+            ? "이전 비밀번호와 다른 비밀번호를 입력해 주세요."
+            : "변경에 실패했습니다. 잠시 후 다시 시도해 주세요."
+        );
+        return;
+      }
+
+      router.replace("/");
+      router.refresh();
+    } catch {
+      // 응답이 늦어도 변경 자체는 적용됐을 수 있다 — 서버에서 실제 상태를 확인한다.
+      try {
+        const { data } = await withTimeout(supabase.auth.getUser(), 5000);
+        if (data?.user?.user_metadata?.must_change_password === false) {
+          router.replace("/");
+          router.refresh();
+          return;
+        }
+      } catch {
+        // 확인도 실패하면 아래 안내로 넘어간다.
+      }
+      setError(
+        "응답이 지연되고 있습니다. 비밀번호가 이미 변경되었을 수 있으니, 페이지를 새로고침한 뒤 방금 입력한 새 비밀번호로 로그인해 보세요."
+      );
+    } finally {
       setLoading(false);
-      return;
     }
-
-    router.replace("/");
-    router.refresh();
   }
 
   return (
