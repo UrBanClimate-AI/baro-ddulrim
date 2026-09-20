@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { ScheduleModule } from "@nestjs/schedule";
+import { AiCallsModule } from "./ai-calls/ai-calls.module";
 import { AiModule } from "./ai/ai.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
@@ -27,6 +28,7 @@ import { SettingsModule } from "./settings/settings.module";
     PrismaModule,
     AuthModule,
     AiModule,
+    AiCallsModule,
     NotificationsModule,
     DashboardModule,
     DistributionModule,

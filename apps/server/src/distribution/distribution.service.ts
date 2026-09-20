@@ -63,11 +63,25 @@ export class DistributionService {
 
   /** 배분 시작 — 승인 직후 호출. 자동이면 첫 제안, 수동이면 관리자 대기. */
   async startDistribution(reportId: string) {
-    const mode = await this.getMode();
+    // AI 전화·카카오톡 등 상담 기반 접수는 관리자가 내용을 확정하는 채널이라
+    // 전역 배분 방식과 무관하게 항상 수동 배정으로만 진행한다.
+    const report = await this.prisma.report.findUnique({
+      where: { id: reportId },
+      select: { channel: true }
+    });
+    const manualOnly =
+      report != null && report.channel !== "WEB" && report.channel !== "APP";
+
+    const mode = manualOnly ? "manual" : await this.getMode();
     if (mode === "auto") {
       return this.offerNext(reportId);
     }
-    await this.setStatus(reportId, ReportStatus.AWAITING_ASSIGNMENT, ActorType.SYSTEM, "수동 배분 대기");
+    await this.setStatus(
+      reportId,
+      ReportStatus.AWAITING_ASSIGNMENT,
+      ActorType.SYSTEM,
+      manualOnly ? "상담 채널 접수 — 수동 배정 전용" : "수동 배분 대기"
+    );
     return { mode, status: "awaiting_manual" as const };
   }
 

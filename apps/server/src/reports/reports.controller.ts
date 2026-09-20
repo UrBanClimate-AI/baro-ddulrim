@@ -14,6 +14,7 @@ import { FilesInterceptor } from "@nestjs/platform-express";
 import { AdminGuard } from "../auth/admin.guard";
 import { CurrentAdmin } from "../auth/auth.decorators";
 import type { AuthAdmin } from "../auth/auth.types";
+import { AdminIntakeReportDto } from "./dto/admin-intake-report.dto";
 import { CreateCustomerReportDto } from "./dto/create-customer-report.dto";
 import {
   ApproveReportDto,
@@ -46,6 +47,13 @@ export class ReportsController {
     @UploadedFiles() files: UploadedReportFile[]
   ) {
     return this.reportsService.createFromCustomer(dto, files ?? []);
+  }
+
+  /** 관리자 직접 접수 — AI 통화·카카오톡·전화 상담 기반 1차 신고 */
+  @Post("admin-intake")
+  @UseGuards(AdminGuard)
+  async createAdminIntake(@Body() dto: AdminIntakeReportDto) {
+    return this.reportsService.createFromAdminIntake(dto);
   }
 
   @Get()

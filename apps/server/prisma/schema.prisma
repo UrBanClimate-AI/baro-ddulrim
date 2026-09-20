@@ -204,6 +204,7 @@ model Report {
   locationCandidates ReportLocationCandidate[]
   bids               Bid[]
   assignment         Assignment?
+  aiCall             AiCall?
   offers             AssignmentOffer[]
   workUpdates        WorkUpdate[]
   templateUsages     MessageTemplateUsage[]
@@ -541,4 +542,50 @@ model AssignmentOffer {
   @@index([reportId, sequence])
   @@index([contractorCompanyId])
   @@index([status, deadline])
+}
+
+// ═══ AI 전화 (ClawOps) ═══
+
+model AiCall {
+  id             String    @id @default(cuid())
+  provider       String    @default("clawops")
+  externalCallId String    @unique // ClawOps callId
+  direction      String    @default("INBOUND")
+  fromNumber     String?
+  toNumber       String?
+  status         String    @default("IN_PROGRESS") // IN_PROGRESS | ENDED | FAILED
+  startedAt      DateTime  @default(now())
+  endedAt        DateTime?
+  durationSec    Int?
+  recordingUrl   String?
+  transcriptText String?   @db.Text // "역할: 발화" 줄 단위 전문
+  summary        String?   @db.Text
+  reportId       String?   @unique // 이 통화로 만들어진 신고
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  report Report?       @relation(fields: [reportId], references: [id])
+  events AiCallEvent[]
+
+  @@index([startedAt])
+  @@index([status])
+}
+
+model AiCallEvent {
+  id        String   @id @default(cuid())
+  aiCallId  String
+  type      String // call_start | transcript | call_end | webhook:* 등
+  payload   Json
+  createdAt DateTime @default(now())
+
+  aiCall AiCall @relation(fields: [aiCallId], references: [id], onDelete: Cascade)
+
+  @@index([aiCallId])
+}
+
+model AiCallPrompt {
+  id        String   @id @default(cuid())
+  content   String   @db.Text
+  note      String?
+  createdAt DateTime @default(now())
 }

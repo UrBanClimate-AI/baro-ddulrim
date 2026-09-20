@@ -28,6 +28,7 @@ import { NotificationsService } from "../notifications/notifications.service";
 import { MapsService } from "../maps/maps.service";
 import { DistributionService } from "../distribution/distribution.service";
 import { PrismaService } from "../prisma/prisma.service";
+import { AdminIntakeReportDto } from "./dto/admin-intake-report.dto";
 import { CreateCustomerReportDto } from "./dto/create-customer-report.dto";
 import {
   ApproveReportDto,
@@ -52,6 +53,80 @@ export class ReportsService {
     private readonly maps: MapsService,
     private readonly distribution: DistributionService,
   ) {}
+
+  /**
+   * 관리자 직접 접수 — AI 통화·카카오톡·전화 상담 내용을 1차 신고로 등록한다.
+   * 상담 채널 신고는 승인 후에도 자동 배분 없이 수동 배정 전용으로 흐른다.
+   */
+  async createFromAdminIntake(dto: AdminIntakeReportDto, adminId?: string) {
+    const phone = this.requireCleanString(dto.phone, "연락처를 입력해 주세요.");
+    const description = this.requireCleanString(
+      dto.description,
+      "상담 내용을 입력해 주세요.",
+    );
+    const reportNo = await this.generateReportNo();
+    const verificationCode = await this.generateVerificationCode();
+    const text = `${dto.addressText ?? ""} ${description}`;
+    const urgency = dto.urgency ?? this.inferUrgency(text);
+    const summary =
+      this.cleanString(dto.summary) ?? this.summarizeDescription(description);
+
+    const created = await this.prisma.$transaction(async (tx) => {
+      const customer = await tx.customer.upsert({
+        where: { phone },
+        update: {},
+        create: { phone },
+      });
+
+      const report = await tx.report.create({
+        data: {
+          reportNo,
+          verificationCode,
+          customerId: customer.id,
+          customerPhone: phone,
+          channel: dto.channel as ReportChannel,
+          status: ReportStatus.ADMIN_REVIEW,
+          issueType: this.inferIssueType(text),
+          urgency,
+          summary,
+          description,
+          addressText: this.cleanString(dto.addressText),
+          addressDetail: this.cleanString(dto.addressDetail),
+        },
+      });
+
+      await tx.reportMessage.create({
+        data: {
+          reportId: report.id,
+          senderType: SenderType.ADMIN,
+          senderId: adminId ?? null,
+          messageType: MessageType.TEXT,
+          content: description,
+        },
+      });
+
+      await tx.reportStatusHistory.create({
+        data: {
+          reportId: report.id,
+          fromStatus: null,
+          toStatus: ReportStatus.ADMIN_REVIEW,
+          actorType: ActorType.ADMIN,
+          actorId: adminId ?? null,
+          reason: "관리자 직접 접수 (상담 채널)",
+        },
+      });
+
+      return report;
+    });
+
+    if (dto.aiCallId) {
+      await this.prisma.aiCall
+        .update({ where: { id: dto.aiCallId }, data: { reportId: created.id } })
+        .catch(() => undefined);
+    }
+
+    return this.findOne(created.reportNo);
+  }
 
   async createFromCustomer(
     dto: CreateCustomerReportDto,

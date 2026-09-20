@@ -66,14 +66,40 @@ function isUrgent(report: ReportListItem) {
 export default async function AdminReportsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; from?: string; to?: string }>;
+  searchParams: Promise<{ status?: string; from?: string; to?: string; channel?: string }>;
 }) {
   const params = await searchParams;
   const from = params.from?.trim() || undefined;
   const to = params.to?.trim() || undefined;
+  const channel = params.channel?.trim() || undefined;
 
   const reports = await getReports();
-  const visible = reports.filter((report) => matchesDateRange(report, from, to));
+  const visible = reports.filter(
+    (report) =>
+      matchesDateRange(report, from, to) &&
+      (channel === "CONSULT"
+        ? report.channel !== "WEB" && report.channel !== "APP"
+        : channel
+          ? report.channel === channel
+          : true)
+  );
+
+  const channelQuery = (value?: string) => {
+    const query = new URLSearchParams();
+    if (from) query.set("from", from);
+    if (to) query.set("to", to);
+    if (value) query.set("channel", value);
+    const qs = query.toString();
+    return qs ? `/admin/reports?${qs}` : "/admin/reports";
+  };
+  const channelChips = [
+    { value: undefined, label: "전체" },
+    { value: "WEB", label: "웹" },
+    { value: "CONSULT", label: "상담 접수 (수동 배정)" },
+    { value: "AI_CALL", label: "AI 전화" },
+    { value: "KAKAO", label: "카카오톡" },
+    { value: "PHONE", label: "전화" }
+  ] as const;
 
   return (
     <AdminShell>
@@ -83,6 +109,18 @@ export default async function AdminReportsPage({
       </header>
 
       <ReportDateFilter from={from} status="all" to={to} />
+
+      <div className="mode-tabs" aria-label="접수 채널" style={{ marginTop: 12 }}>
+        {channelChips.map((chip) => (
+          <Link
+            className={`mode-tab${(channel ?? undefined) === chip.value ? " active" : ""}`}
+            href={channelQuery(chip.value)}
+            key={chip.label}
+          >
+            {chip.label}
+          </Link>
+        ))}
+      </div>
 
       <div className="kanban-board cols-5" style={{ marginTop: 16 }}>
         {columns.map((col) => {

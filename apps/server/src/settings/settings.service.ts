@@ -6,7 +6,9 @@ import { UpdateSettingDto } from "./dto/update-setting.dto";
 // 실제 동작에 연결된 설정만 노출한다. (조회 보안 모드는 공개 노선 확정으로 제거)
 const allowedSettings: Record<string, string[]> = {
   ai_provider: ["openai", "gemini"],
-  map_provider: ["kakao", "naver"]
+  map_provider: ["kakao", "naver"],
+  distribution_mode: ["auto", "manual"],
+  distribution_timeout_minutes: ["15", "30", "60"]
 };
 
 @Injectable()

@@ -354,3 +354,56 @@ export function getCompanyActivity(companyId: string) {
 export function getAppSettings() {
   return fetchJson<AppSetting[]>("/settings", []);
 }
+
+export type AiCallListItem = {
+  id: string;
+  provider: string;
+  externalCallId: string;
+  direction: string;
+  fromNumber: string | null;
+  toNumber: string | null;
+  status: string;
+  startedAt: string | null;
+  endedAt: string | null;
+  durationSec: number | null;
+  recordingUrl: string | null;
+  transcriptText: string | null;
+  summary: string | null;
+  reportId: string | null;
+  reportNo: string | null;
+  reportStatus: string | null;
+  eventCount: number;
+};
+
+export type AiCallAgentStatus = {
+  enabled: boolean;
+  running: boolean;
+  agentNumber: string | null;
+};
+
+export type AiCallPromptInfo = {
+  content: string;
+  isDefault: boolean;
+  updatedAt: string | null;
+  history: { id: string; content: string; note: string | null; createdAt: string | null }[];
+};
+
+export function getAiCalls() {
+  return fetchJson<{ agent: AiCallAgentStatus; calls: AiCallListItem[] }>(
+    "/ai-calls",
+    { agent: { enabled: false, running: false, agentNumber: null }, calls: [] }
+  );
+}
+
+export function getAiCall(id: string) {
+  return fetchJson<AiCallListItem | null>(`/ai-calls/${encodeURIComponent(id)}`, null);
+}
+
+export function getAiCallPrompt() {
+  return fetchJson<AiCallPromptInfo>("/ai-calls/prompt", {
+    content: "",
+    isDefault: true,
+    updatedAt: null,
+    history: []
+  });
+}

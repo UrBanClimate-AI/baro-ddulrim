@@ -10,6 +10,7 @@ import {
   LayoutGrid,
   LayoutTemplate,
   Map,
+  PhoneCall,
   Settings,
 } from "lucide-react";
 
@@ -18,6 +19,7 @@ const items = [
   { href: "/admin/reports", label: "신고", icon: FileText, exact: false },
   { href: "/admin/contractors", label: "업체", icon: Building2, exact: false },
   { href: "/admin/map", label: "지도", icon: Map, exact: false },
+  { href: "/admin/ai-calls", label: "AI 전화", icon: PhoneCall, exact: false },
   { href: "/admin/templates", label: "템플릿", icon: LayoutTemplate, exact: false },
   { href: "/admin/classification", label: "분류 성능", icon: BarChart3, exact: false },
   { href: "/admin/settings", label: "설정", icon: Settings, exact: false },
