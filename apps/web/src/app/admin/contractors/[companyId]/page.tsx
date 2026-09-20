@@ -5,6 +5,7 @@ import { CompanyActivityCards } from "@/components/company-activity";
 import { Select } from "@/components/ui/select";
 import { getAdminContractorCompanies, getCompanyActivity } from "@/lib/admin-api";
 import { contractorStatusLabels, formatDateTime, labelOf } from "@/lib/labels";
+import { parseApplyProposal } from "../apply-proposal";
 import { updateContractorStatusAction } from "../actions";
 
 export const dynamic = "force-dynamic";
@@ -33,6 +34,7 @@ export default async function AdminContractorDetailPage({
 
   const activity = await getCompanyActivity(company.id);
   const updateStatus = updateContractorStatusAction.bind(null, company.id);
+  const proposal = parseApplyProposal(company.description);
 
   return (
     <AdminShell>
@@ -46,7 +48,16 @@ export default async function AdminContractorDetailPage({
         <div>
           <p className="eyebrow">{company.businessNumber}</p>
           <h1>{company.companyName}</h1>
-          <p>{company.description ?? "업체 소개가 없습니다."}</p>
+          {proposal ? (
+            <p>
+              홈페이지 협력 제안으로 접수된 업체입니다 ·{" "}
+              {formatDateTime(company.createdAt)} 접수
+            </p>
+          ) : (
+            <p style={{ whiteSpace: "pre-line" }}>
+              {company.description ?? "업체 소개가 없습니다."}
+            </p>
+          )}
         </div>
         <span className="status-badge">
           {labelOf(contractorStatusLabels, company.status)}
@@ -96,11 +107,52 @@ export default async function AdminContractorDetailPage({
               </dd>
             </div>
             <div>
+              <dt>희망 반경</dt>
+              <dd>
+                {company.serviceRadiusKm != null
+                  ? `${company.serviceRadiusKm}km`
+                  : "-"}
+              </dd>
+            </div>
+            <div>
+              <dt>접수</dt>
+              <dd>{formatDateTime(company.createdAt)}</dd>
+            </div>
+            <div>
               <dt>승인</dt>
               <dd>{formatDateTime(company.approvedAt)}</dd>
             </div>
           </dl>
         </article>
+
+        {proposal ? (
+          <article className="panel-section">
+            <h2>협력 제안 내용</h2>
+            <dl className="info-list">
+              {proposal.rows.map((row) => (
+                <div key={row.label}>
+                  <dt>{row.label}</dt>
+                  <dd>{row.value}</dd>
+                </div>
+              ))}
+            </dl>
+            {proposal.message ? (
+              <p
+                style={{
+                  marginTop: 12,
+                  padding: "10px 12px",
+                  background: "#f5fbff",
+                  border: "1px solid #d9edf7",
+                  borderRadius: 10,
+                  fontSize: 14,
+                  whiteSpace: "pre-line",
+                }}
+              >
+                💬 {proposal.message}
+              </p>
+            ) : null}
+          </article>
+        ) : null}
 
         <article className="panel-section">
           <h2>처리 이력</h2>

@@ -62,7 +62,7 @@ export default async function AdminContractorsPage() {
                 <th>지역</th>
                 <th>상태</th>
                 <th>활동</th>
-                <th>승인</th>
+                <th>접수·승인</th>
               </tr>
             </thead>
             <tbody>
@@ -89,11 +89,21 @@ export default async function AdminContractorsPage() {
                     <span className="status-badge">
                       {labelOf(contractorStatusLabels, company.status)}
                     </span>
+                    {company.statusReason ? (
+                      <span>{company.statusReason}</span>
+                    ) : null}
                   </td>
                   <td data-label="활동">
                     <span>배정 {company.assignmentCount}</span>
                   </td>
-                  <td data-label="승인">{formatDateTime(company.approvedAt)}</td>
+                  <td data-label="접수·승인">
+                    <strong>{formatDateTime(company.createdAt)}</strong>
+                    <span>
+                      {company.approvedAt
+                        ? `승인 ${formatDateTime(company.approvedAt)}`
+                        : "미승인"}
+                    </span>
+                  </td>
                 </tr>
               ))}
             </tbody>
