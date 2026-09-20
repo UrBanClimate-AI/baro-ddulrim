@@ -6,7 +6,8 @@ import { PendingOverlay } from "@/components/pending-overlay";
 import { ReportPhotoUploader } from "@/components/report-photo-uploader";
 import { SubmitButton } from "@/components/submit-button";
 import Image from "next/image";
-import { diagDescription, diagFlagLabels, diagUrgency, parseDiag } from "./diag";
+import { diagToSelection, diagUrgency, parseDiag } from "./diag";
+import { SymptomPicker } from "./symptom-picker";
 
 export default async function NewReportPage({
   searchParams
@@ -15,10 +16,8 @@ export default async function NewReportPage({
 }) {
   const { diag: rawDiag } = await searchParams;
   const diag = parseDiag(rawDiag);
-  const defaultDescription = diag ? diagDescription(diag) : undefined;
+  const initialSelection = diag ? diagToSelection(diag) : null;
   const defaultUrgency = diag ? diagUrgency(diag) : "NORMAL";
-  const won = (n: number | undefined) =>
-    typeof n === "number" ? n.toLocaleString("ko-KR") : null;
 
   return (
     <main className="shell report-shell">
@@ -41,38 +40,13 @@ export default async function NewReportPage({
         </div>
 
         {diag ? (
-          <aside className="diag-card" aria-label="자가 진단 결과">
+          <aside className="diag-card" aria-label="자가 진단 불러옴">
             <div className="diag-head">
               <ClipboardCheck aria-hidden="true" size={18} />
-              <strong>자가 진단 결과가 담긴 접수입니다</strong>
+              <strong>자가 진단 내용을 불러왔어요</strong>
             </div>
-            <dl>
-              {diag.place ? (
-                <>
-                  <dt>장소</dt>
-                  <dd>
-                    {diag.place.label}
-                    {diag.point ? ` / ${diag.point.spaceLabel} · ${diag.point.label}` : ""}
-                  </dd>
-                </>
-              ) : null}
-              {diag.stageName ? (
-                <>
-                  <dt>추정 단계</dt>
-                  <dd>
-                    {diag.stageName}
-                    {won(diag.lo) && won(diag.hi)
-                      ? ` · 예상 ${won(diag.lo)}~${won(diag.hi)}원 (부가세 별도)`
-                      : ""}
-                  </dd>
-                </>
-              ) : null}
-            </dl>
-            {diagFlagLabels(diag).length ? (
-              <p className="diag-flags">{diagFlagLabels(diag).join(" · ")}</p>
-            ) : null}
             <p className="diag-note">
-              아래 증상란에 진단 내용이 채워져 있어요. 상세 상황만 덧붙이고 접수하시면 됩니다.
+              아래 증상 선택에 진단 결과가 채워져 있습니다. 바뀐 게 있으면 다시 골라 주세요.
             </p>
           </aside>
         ) : null}
@@ -94,15 +68,8 @@ export default async function NewReportPage({
 
           <LocationSearchInput />
 
-          <label htmlFor="description">증상</label>
-          <textarea
-            defaultValue={defaultDescription}
-            id="description"
-            name="description"
-            placeholder="역류, 침수, 악취 등 현재 상황"
-            required
-            rows={diag ? 10 : 5}
-          />
+          <label>증상</label>
+          <SymptomPicker initial={initialSelection} />
 
           <fieldset className="urgency-choice">
             <legend>얼마나 급한가요?</legend>

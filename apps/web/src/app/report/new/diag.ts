@@ -55,6 +55,18 @@ export function diagAnswer(diag: DiagPayload, code: string): DiagAnswer | null {
   return diag.answers?.find((a) => a.code === code) ?? null;
 }
 
+/** 자가 진단 페이로드 → 증상 선택 UI 초기값 */
+export function diagToSelection(diag: DiagPayload): Record<string, string> {
+  const sel: Record<string, string> = {};
+  if (diag.place?.code) sel.place = diag.place.code;
+  if (diag.point?.code) {
+    sel.space = diag.point.space;
+    sel.point = diag.point.code;
+  }
+  for (const a of diag.answers ?? []) sel[a.code] = a.value;
+  return sel;
+}
+
 /** 자가 진단 내용을 접수 증상란에 담을 텍스트로 정리한다. */
 export function diagDescription(diag: DiagPayload): string {
   const won = (n: number | undefined) =>

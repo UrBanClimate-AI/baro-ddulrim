@@ -3919,3 +3919,92 @@ a.report-card.urgent:hover {
   font-size: 13px;
   color: var(--color-muted);
 }
+
+/* 증상 선택 (check.html 자가진단과 같은 뎁스형 UI) */
+.sym-picker { display: flex; flex-direction: column; gap: 18px; }
+.sym-required-proxy {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.sym-step { display: flex; flex-direction: column; gap: 8px; }
+.sym-q { margin: 0; font-weight: 700; font-size: 15px; color: var(--color-text); }
+.sym-q small { font-weight: 600; color: var(--color-muted); }
+.sym-sub { margin: -4px 0 0; font-size: 13px; color: var(--color-muted); }
+.sym-group { display: flex; flex-direction: column; gap: 6px; }
+.sym-grp {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+}
+.sym-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.sym-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--color-line);
+  border-radius: 12px;
+  background: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+.sym-chip .emo { font-size: 16px; }
+.sym-chip:hover { border-color: var(--color-primary); }
+.sym-chip.on {
+  border-color: var(--color-primary);
+  background: #eaf6fc;
+  box-shadow: 0 0 0 2px rgba(30, 155, 215, 0.18);
+}
+.sym-chip.warn.on { border-color: var(--color-warning); background: #fdf3e7; box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.16); }
+.sym-hint { margin: 0; font-size: 13px; color: var(--color-muted); }
+.sym-result {
+  border: 1px solid #bfe3f5;
+  border-radius: 14px;
+  background: #f2fafe;
+  padding: 16px 18px;
+}
+.sym-result-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.sym-result-head div { display: flex; flex-direction: column; }
+.sym-result-head strong { font-size: 16px; }
+.sym-result-head span { font-size: 13px; color: var(--color-muted); }
+.sym-stage {
+  flex: none;
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 800;
+  font-size: 14px;
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+.sym-result dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 14px;
+  margin: 0;
+  font-size: 14px;
+}
+.sym-result dt { color: var(--color-muted); font-weight: 600; }
+.sym-result dd { margin: 0; font-weight: 700; }
+.sym-result dd small { font-weight: 600; color: var(--color-muted); }
+.sym-flags { margin: 10px 0 0; font-size: 13px; font-weight: 700; color: #b45309; }
+.sym-shared {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--color-text);
+  background: #fdf3e7;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.sym-note { margin: 10px 0 0; font-size: 12.5px; color: var(--color-muted); }
+.sym-detail { display: flex; flex-direction: column; gap: 6px; }
+.sym-detail > span { font-weight: 700; font-size: 15px; }
+.sym-detail > span small { font-weight: 600; color: var(--color-muted); }
